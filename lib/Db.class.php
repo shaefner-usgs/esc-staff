@@ -3,16 +3,23 @@
 /**
  * Database queries for staff list and whiteboard
  *
+ * App uses 2 db connectors:
+ *   1 for status table (internal) and 1 for employees, locations (external)
+ *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
 class Db {
-  private $_db, $_ip;
+  private $_dbExt, $_dbInt, $_ip;
 
   public function __construct() {
-    // Database connector (sets $db)
+    // Internal db connector - status entries (sets $db)
     include_once $_SERVER['DOCUMENT_ROOT'] . '/template/db/dbConnect-escintWrite.inc.php';
+    $this->_dbInt = $db;
 
-    $this->_db = $db;
+    // External db connector - employees, locations (also sets $db)
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/template/db/dbConnect-escRead.inc.php';
+    $this->_dbExt = $db;
+
     $this->_ip = $_SERVER['REMOTE_ADDR'];
   }
 
@@ -28,9 +35,14 @@ class Db {
    */
   private function _execQuery ($sql, $params=NULL) {
     try {
-      $stmt = $this->_db->prepare($sql);
+      // Use appropriate connector depending on which table is being queried
+      if (preg_match('/esc_statusEntries/', $sql)) {
+        $stmt = $this->_dbInt->prepare($sql);
+      } else {
+        $stmt = $this->_dbExt->prepare($sql);
+      }
 
-      // bind sql params
+      // Bind sql params
       if (is_array($params)) {
         foreach ($params as $key => $value) {
           $type = $this->_getType($value);
