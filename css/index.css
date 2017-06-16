@@ -1,0 +1,19 @@
+@import '_common.css';
+
+table {
+  margin-top: -1.5em;
+}
+
+#main td, #main th {
+  padding: 8px 20px 8px 0;
+  font-weight: normal;
+}
+#main th {
+  font-size: 2em;
+  font-family: 'Neuton', serif;
+  padding-top: 1em;
+}
+
+td:nth-child(1), td:nth-child(4) {
+  white-space: nowrap;
+}

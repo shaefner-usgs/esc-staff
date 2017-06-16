@@ -1,0 +1,71 @@
+/* Override Foundation's defaults that get in the way */
+
+h2 {
+  margin-top: .5em;
+}
+
+table {
+  border: 0;
+  border-spacing: 0;
+}
+table tbody tr:nth-child(even) {
+  background: none;
+}
+th {
+  font-weight: normal;
+}
+
+/* Status entries */
+
+div.alert-box {
+  margin-top: 2em;
+}
+.alert-box em, #deleteModal p em {
+  font-style: normal;
+  font-weight: normal;
+  margin-left: 1em;
+}
+
+.past {
+  color: #999 !important;
+  background-color: #f9f9f9 !important;
+}
+.past + table td, .past + table th {
+  color: #999;
+}
+
+ul.actions {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  margin: 0;
+  list-style: none;
+}
+.actions li {
+  float: left;
+  margin-right: 5px;
+}
+.actions li a {
+  text-decoration: none;
+  text-shadow: none;
+}
+
+.status {
+  border: 1px solid #ddd;
+  border-width: 0 1px 1px;
+  margin: -12px 0 0;
+  padding-top: 5px;
+  width: 100%;
+  margin-bottom: 1em;
+}
+.status th, .status td {
+  vertical-align: top;
+  padding: 2px 4px;
+  line-height: 1.4;
+}
+.status th {
+  width: 8em;
+  text-align: right;
+  color: #777;
+  white-space: nowrap;
+}

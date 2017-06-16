@@ -1,0 +1,24 @@
+RewriteEngine on
+
+# ignore rewrite rules if a matching file, directory, or symbolic link exists (serve existing file instead)
+RewriteCond %{REQUEST_FILENAME} -f		[NC,OR]
+RewriteCond %{REQUEST_FILENAME} -d		[NC,OR]
+RewriteCond %{REQUEST_FILENAME} -l		[NC]
+RewriteRule .* -		[L]
+
+
+###
+ # staff directory: rewrite for sort option
+ ##
+
+RewriteRule	^(location|name|status)/?$		/contact/staff/index.php?sortby=$1		[L]
+
+
+###
+ # staff directory: rewrite for selected employee (email shortname)
+ ##
+
+RewriteRule ([^/]+)/status/(\d+)/delete/?$  /contact/staff/status.php?shortname=$1&id=$2&action=delete  [L]
+RewriteRule ([^/]+)/status/(\d+)/?$         /contact/staff/status.php?shortname=$1&id=$2&view=edit  [L]
+RewriteRule ([^/]+)/status/?$               /contact/staff/status.php?shortname=$1  [L]
+RewriteRule ([^/]+)/?$                      /contact/staff/employee.php?shortname=$1  [L]

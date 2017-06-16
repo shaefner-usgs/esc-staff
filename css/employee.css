@@ -1,0 +1,18 @@
+@import '_common.css';
+
+h1 em {
+  color: #999;
+  font-size: .67em;
+  font-style: normal;
+}
+
+#main th, #main td {
+  vertical-align: top;
+  line-height: 18px;
+  padding: 0.5em;
+}
+th {
+  color: #777;
+  text-align: right;
+  white-space: nowrap;
+}

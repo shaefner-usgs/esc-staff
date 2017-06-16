@@ -1,0 +1,36 @@
+@import '_common.css';
+
+h1 em {
+  display: block;
+  font-size: .5em;
+  font-style: normal;
+  color: #666;
+  margin-bottom: -.3em
+}
+
+#deleteModal ul {
+  position: static;
+}
+#deleteModal p {
+  font-weight: bold;
+}
+
+#begin, #end {
+  width: 10em;
+  display: inline;
+}
+.ui-datepicker-calendar td {
+  width: 30px;
+}
+
+#forever {
+  white-space: nowrap;
+}
+#forever label {
+  display: inline;
+}
+
+p.error {
+  color: #c60f13;
+  margin: -10px 0 10px;
+}
