@@ -11,7 +11,7 @@ class Db {
   public function __construct() {
     // Database connector (sets $db)
     include_once $_SERVER['DOCUMENT_ROOT'] . '/template/db/dbConnect-escintWrite.inc.php';
-    
+
     $this->_db = $db;
     $this->_ip = $_SERVER['REMOTE_ADDR'];
   }
@@ -106,7 +106,7 @@ class Db {
     // need to set initial value for changed (MySQL schema updates it automatically)
     $params['changed'] = date('Y-m-d H:i:s');
     $params['ip'] = $this->_ip;
-    
+
     $setClause = $this->_getSetClause($params);
 
     $sql = "INSERT INTO esc_statusEntries
@@ -162,34 +162,18 @@ class Db {
    */
   public function selectEmployees ($shortname=NULL) {
     $params = array();
-    $joinClause = '';
     $whereClause = '';
 
     // Get specific employee
     if ($shortname) {
       $params['shortname'] = "$shortname@%";
-      $joinClause = 'LEFT JOIN esc_locations USING (location)';
       $whereClause .= 'WHERE `email` LIKE :shortname';
     }
 
     $sql = "SELECT * FROM esc_employees
-      $joinClause
+      LEFT JOIN esc_locations USING (location)
       $whereClause
       ORDER BY `lastname` ASC, `firstname` ASC";
-
-    return $this->_execQuery($sql, $params);
-  }
-
-  /**
-   * Get full mailing address for an office location
-   *
-   * @return {Function}
-   */
-  public function selectLocation ($location) {
-    $params['location'] = $location;
-
-    $sql = 'SELECT * FROM esc_locations
-      WHERE `location` = :location';
 
     return $this->_execQuery($sql, $params);
   }

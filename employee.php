@@ -35,9 +35,6 @@ if (!isset($TEMPLATE)) {
   include_once ($_SERVER['DOCUMENT_ROOT'] . "/template/core/template.inc.php");
 }
 
-$rsLocation = $Db->selectLocation($Employee->location);
-$location = $rsLocation->fetch(PDO::FETCH_OBJ);
-
 // Create and render view
-$View = new EmployeeView($Employee, $location, $statusEntries);
+$View = new EmployeeView($Employee, $statusEntries);
 $View->render();

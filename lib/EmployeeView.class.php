@@ -4,17 +4,15 @@
  * Employee view - creates the HTML for employee.php
  *
  * @param $employee {Employee instance}
- * @param $location {Object}
  * @param $statusEntries {Array}
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
 class EmployeeView {
-  private $_employee, $_location, $_statusEntries;
+  private $_employee, $_statusEntries;
 
-  public function __construct (Employee $employee, $location, $statusEntries) {
+  public function __construct (Employee $employee, $statusEntries) {
     $this->_employee = $employee;
-    $this->_location = $location;
     $this->_statusEntries = $statusEntries;
   }
 
@@ -24,7 +22,7 @@ class EmployeeView {
    * @return $html {String}
    */
   private function _getAddress () {
-    $location = $this->_location;
+    $Employee = $this->_employee;
 
     $html = sprintf('<div class="vcard">
         <div class="adr">
@@ -35,12 +33,12 @@ class EmployeeView {
           <span class="postal-code">%s</span>
         </div>
       </div>',
-    	$location->institution,
-    	$location->address1,
-    	$location->address2,
-    	$location->city,
-    	$location->state,
-    	$location->zipcode
+      $Employee->institution,
+      $Employee->address1,
+      $Employee->address2,
+      $Employee->city,
+      $Employee->state,
+      $Employee->zipcode
     );
 
     return $html;
