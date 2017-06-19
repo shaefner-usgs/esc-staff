@@ -83,6 +83,18 @@ class Db {
   }
 
   /**
+   * Take an array of SQL fields and return a comma-separated string with fields
+   *   enclosed in backticks
+   *
+   * @param $array {Array}
+   *
+   * @return {String}
+   */
+  private function _getSqlFieldList ($array) {
+    return '`' . implode('`, `', $array) . '`';
+  }
+
+  /**
    * Get data type for a sql parameter (PDO::PARAM_* constant)
    *
    * @param $var {?}
@@ -140,7 +152,7 @@ class Db {
 
     $sql = 'UPDATE esc_statusEntries
       SET `deleted` = 1, ip = :ip
-      WHERE ID = :id';
+      WHERE `id` = :id';
 
     return $this->_execQuery($sql, $params);
   }
@@ -191,29 +203,16 @@ class Db {
   }
 
   /**
-   * Get *recurring* status entries
-   *
-   * @param $id {Integer}
-   *     id of employee to query
-   *
-   * @return {Function}
-   */
-  public function selectRecStatusEntries ($shortname=NULL) {
-
-  }
-
-  /**
-   * Get status entries - for a specific employee or a complete list
+   * Get status entries - for a specific employee or all employees
    *
    * @param $shortname {String}
    *     Optional email shortname (text before '@') of employee to query
-   * @param $filter {String <past | current | future>}
-   *     Optional - default is 'current' (past / future entries not included)
+   * @param $filter {String <past | current | future | recurring>}
+   *     Optional - default is 'current' (past / future, etc. not included)
    *
    * @return {Function}
    */
   public function selectStatusEntries ($shortname=NULL, $filter='current') {
-    $params['today'] = date('Y-m-d');
     $whereClause = 'WHERE `deleted` = 0'; // not deleted by user
 
     // Get status entries for a specific employee
@@ -222,21 +221,36 @@ class Db {
       $whereClause .= ' AND `shortname` = :shortname';
     }
 
-    // Set up time period filter
-    if ($filter === 'past') {
-      $whereClause .= ' AND `end` < :today';
+    if ($filter === 'recurring') {
+      $orderbyClause = 'ORDER BY `shortname` ASC';
+      $timePeriodFields = $this->_getSqlFieldList(
+        array('monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+      );
+      $whereClause .= ' AND `recurring` = 1';
     }
-    else if ($filter === 'current') {
-      $whereClause .= ' AND `begin` <= :today AND (`end` >= :today OR `end` IS NULL)';
-    }
-    else if ($filter === 'future') {
-      $whereClause .= ' AND `begin` > :today';
+    else {
+      $orderbyClause = 'ORDER BY `shortname` ASC, `begin` ASC';
+      $params['today'] = date('Y-m-d');
+      $timePeriodFields = $this->_getSqlFieldList(array('begin', 'end'));
+      $whereClause .= ' AND `recurring` = 0';
+
+      // Set up time period filter
+      if ($filter === 'past') {
+        $whereClause .= ' AND `end` < :today';
+      }
+      else if ($filter === 'current') {
+        $whereClause .= ' AND `begin` <= :today AND (`end` >= :today OR `end` IS NULL)';
+      }
+      else if ($filter === 'future') {
+        $whereClause .= ' AND `begin` > :today';
+      }
     }
 
-    $sql = "SELECT `shortname`, `id`, `status`, `begin`, `end`, `contact`,
-      `backup`, `comments` FROM esc_statusEntries
+    $sql = "SELECT `shortname`, `id`, `status`, `contact`, `backup`, `comments`,
+      $timePeriodFields
+      FROM esc_statusEntries
       $whereClause
-      ORDER BY `shortname` ASC, `begin` ASC";
+      $orderbyClause";
 
     return $this->_execQuery($sql, $params);
   }
