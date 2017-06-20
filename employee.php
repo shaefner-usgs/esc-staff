@@ -4,6 +4,7 @@ include_once 'lib/Db.class.php'; // Database connector, queries
 include_once 'lib/Employee.class.php'; // Employee model
 include_once 'lib/EmployeeView.class.php'; // View
 include_once 'lib/Status.class.php'; // Status model
+include_once 'lib/StatusCollection.class.php'; // Status collection
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/template/functions/functions.inc.php';
 
@@ -12,20 +13,9 @@ if (!isset($TEMPLATE)) {
 
   $shortname = safeParam('shortname');
 
-  // Query database to get employee's details and status entries
+  // Query database to get employee's details and create an Employee instance
   $rsEmployee = $Db->selectEmployees($shortname);
-  $rsStatusEntries = $Db->selectStatusEntries($shortname);
-  $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
-
-  // Use db results to set up params needed by the View
-  $statusEntries = array(
-    'current' => $rsStatusEntries->fetchall(PDO::FETCH_CLASS, 'Status'),
-    'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status')
-  );
-
-  $rsEmployee->setFetchMode(PDO::FETCH_CLASS, 'Employee',
-    array($statusEntries['current'])
-  );
+  $rsEmployee->setFetchMode(PDO::FETCH_CLASS, 'Employee');
   $Employee = $rsEmployee->fetch();
 
   $TITLETAG = $Employee->fullname;
@@ -35,6 +25,29 @@ if (!isset($TEMPLATE)) {
   include_once ($_SERVER['DOCUMENT_ROOT'] . "/template/core/template.inc.php");
 }
 
-// Create and render view
-$View = new EmployeeView($Employee, $statusEntries);
+// Query database to get employee's status entries
+$rsStatusEntriesCurrent = $Db->selectStatusEntries($shortname);
+$rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
+
+// Create a Status instance for each entry
+$statusEntries = array(
+  'current' => $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status'),
+  'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status')
+);
+
+// Group status entries into Collections by type
+$StatusCollection = new stdClass(); // initialize empty object
+foreach ($statusEntries as $type => $entries) {
+  if (count($entries) > 0) {
+    $StatusCollection->$type = new StatusCollection;
+
+    foreach ($entries as $Entry) {
+      $StatusCollection->$type->add($Entry);
+    }
+  }
+}
+$Employee->status = $StatusCollection;
+
+// Create and render View
+$View = new EmployeeView($Employee);
 $View->render();

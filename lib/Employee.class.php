@@ -1,9 +1,7 @@
 <?php
 
 /**
- * Model for ESC Employee
- *
- * @param $statusEntries {Array}
+ * Model for Employee
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
@@ -11,17 +9,12 @@ class Employee {
   // Initialize outside constructor so it's available to populate immediately
   private $_data = array();
 
-  public function __construct ($statusEntries=NULL) {
+  public function __construct () {
     // Attach extra (non-db) props
     $this->_data['firstletter'] = $this->_getFirstLetter();
     $this->_data['fullname'] = $this->_getFullName();
     $this->_data['lastfirst'] = $this->_getFullName('lastfirst');
     $this->_data['shortname'] = $this->_getShortName();
-
-    // Convenience property - set current status (String} if status entries supplied
-    if (is_array($statusEntries)) {
-      $this->_data['status'] = $this->_getCurrentStatus($statusEntries);
-    }
   }
 
   public function __get ($name) {
@@ -30,46 +23,6 @@ class Employee {
 
   public function __set ($name, $value) {
     $this->_data[$name] = $value;
-  }
-
-  /**
-   * Get employee's shortname (text before '@' in email)
-   *
-   * @return {String}
-   */
-  private function _getShortName () {
-    return strstr($this->_data['email'], '@', true);
-  }
-
-  /**
-   * Get employee's current status
-   *
-   * @param $statusEntries {Array}
-   *     Multi-dimensional array grouped by user's shortname
-   *
-   * return $Status {Object}
-   */
-  private function _getCurrentStatus ($statusEntries) {
-    $default = 'in the office';
-    $Status = new Status(array('status' => $default)); // instantiate w/ default value
-
-    // Get status entries for employee
-    if (array_key_exists($this->_data['shortname'], $statusEntries)) {
-      $entries = $statusEntries[$this->_data['shortname']];
-
-      // Prioritize 1) entries with explicit ending dates; 2) 'newer' entries
-      //   (array is sorted by begin date, so 'newer' entries will prevail)
-      foreach ($entries as $entry) {
-        // Only set status to 'indefinite' entry if it's overriding default value
-        if ($entry['end'] || $Status->status === $default) {
-          $Status->begin = $entry['begin'];
-          $Status->end = $entry['end'];
-          $Status->status = $entry['status'];
-        }
-      }
-    }
-
-    return $Status;
   }
 
   /**
@@ -106,5 +59,43 @@ class Employee {
     }
 
     return $fullname;
+  }
+
+  /**
+   * Get employee's shortname (text before '@' in email)
+   *
+   * @return {String}
+   */
+  private function _getShortName () {
+    return strstr($this->_data['email'], '@', true);
+  }
+
+  /**
+   * Get employee's status right now
+   *
+   * return $Status {Object: Status instance}
+   */
+  public function getStatusNow () {
+    $defaultStatus = 'in the office';
+    $statusEntries = $this->_data['status'];
+
+    // Create default Status instance
+    $Status = new Status(array('status' => $defaultStatus));
+
+    // Check if employee has any 'current' status entries set
+    if (property_exists($statusEntries, 'current')) {
+
+      // Prioritize 1) entries with explicit ending dates; 2) 'newer' entries
+      //   (array is sorted by begin date, so 'newer' entries will prevail)
+      foreach ($statusEntries->current->entries as $Entry) {
+
+        // Only set status to 'indefinite' entry if it's overriding default value
+        if ($Entry->end || $Status->status === $defaultStatus) {
+          $Status = $Entry;
+        }
+      }
+    }
+
+    return $Status;
   }
 }

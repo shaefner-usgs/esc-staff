@@ -1,6 +1,6 @@
 <?php
 /**
- * ESC Employee Collection
+ * Collection of Employees
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
@@ -13,7 +13,7 @@ class EmployeeCollection {
   }
 
   /**
-   * Add an employee to the Collection
+   * Add an Employee instance to the Collection
    *
    * @param $Employee {Object}
    */
@@ -37,7 +37,7 @@ class EmployeeCollection {
       $firstname[$index] = strtolower($Employee->firstname);
       $lastname[$index] = strtolower($Employee->lastname);
       $location[$index] = strtolower($Employee->location);
-      $status[$index] = strtolower($Employee->status->status);
+      $status[$index] = strtolower($Employee->getStatusNow()->status);
     }
 
     if ($sortBy === 'name') {

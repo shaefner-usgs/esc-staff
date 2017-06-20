@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Employee list view - creates the HTML for index.php\
+ * Employee list view - creates the HTML for index.php
  *
  * @param $collection {Object}
  *
@@ -48,12 +48,14 @@ class IndexView {
     $sortBy = $this->_collection->sortBy;
 
     foreach ($this->_collection->employees as $Employee) {
+      $Status = $Employee->getStatusNow();
+
       if ($sortBy === 'name') {
         $set = $Employee->firstletter;
       } else if ($sortBy === 'location') {
         $set = $Employee->location;
       } else if ($sortBy === 'status') {
-        $set = ucwords($Employee->status->status);
+        $set = ucwords($Status->status);
       }
 
       if ($setPrev !== $set) {
@@ -67,8 +69,8 @@ class IndexView {
 
       $openTag = '';
       $closeTag = '';
-      if ($Employee->status->status !== 'in the office') {
-        $openTag = '<strong class="has-tip tip-right" title="' . $Employee->status->getTimeSpan() . '">';
+      if ($Status->status !== 'in the office') {
+        $openTag = '<strong class="has-tip tip-right" title="' . $Status->getTimeSpan() . '">';
         $closeTag = '</strong>';
       }
 
@@ -81,7 +83,7 @@ class IndexView {
         $Employee->shortname,
         $Employee->lastfirst,
         $openTag,
-        $Employee->status->status,
+        $Status->status,
         $closeTag,
         $Employee->email,
         $Employee->phone

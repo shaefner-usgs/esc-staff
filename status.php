@@ -4,6 +4,7 @@ include_once 'lib/Db.class.php'; // Database connector, queries
 include_once 'lib/Employee.class.php'; // Employee model
 include_once 'lib/Status.class.php'; // Status model
 include_once 'lib/StatusView.class.php'; // View
+include_once 'lib/StatusCollection.class.php'; // Status collection
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/template/functions/functions.inc.php';
 
@@ -33,7 +34,7 @@ if (!isset($TEMPLATE)) {
     }
   }
 
-  // Query database to get employee's details
+  // Query database to get employee's details and create an Employee instance
   $rsEmployee = $Db->selectEmployees($shortname);
 
   $rsEmployee->setFetchMode(PDO::FETCH_CLASS, 'Employee');
@@ -50,24 +51,39 @@ if (!isset($TEMPLATE)) {
 
 $statusEntries = array();
 
-// Query database to get employee's status entries and populate array for View
-if ($view === 'add') { // default view - create new entry + list of status entries
-  $rsStatusEntries = $Db->selectStatusEntries($shortname);
+if ($view === 'add') { // default view: show add form + list of status entries
+  // Query database to get employee's status entries
+  $rsStatusEntriesCurrent = $Db->selectStatusEntries($shortname);
   $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
   $rsStatusEntriesPast = $Db->selectStatusEntries($shortname, 'past');
 
-  $statusEntries['current'] = $rsStatusEntries->fetchall(PDO::FETCH_CLASS, 'Status');
+  // Create a Status instance for each entry
+  $statusEntries['current'] = $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status');
   $statusEntries['future'] = $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status');
   $statusEntries['past'] = $rsStatusEntriesPast->fetchall(PDO::FETCH_CLASS, 'Status');
 }
-else if ($view === 'edit') { // edit entry view
+else if ($view === 'edit') { // edit entry view: show edit form containing entry
+  // Create a Status instance for entry user is editing
   $rsStatusEntry = $Db->selectStatusEntryById($id);
   $rsStatusEntry->setFetchMode(PDO::FETCH_CLASS, 'Status');
   $Status = $rsStatusEntry->fetch();
 
-  $statusEntries['edit'] = $Status;
+  $statusEntries['edit'] = array($Status);
 }
 
-// Create and render view
-$View = new StatusView($Employee, $statusEntries);
+// Group status entries into Collections by type
+$StatusCollection = new stdClass(); // initialize empty object
+foreach ($statusEntries as $type => $entries) {
+  if (count($entries) > 0) {
+    $StatusCollection->$type = new StatusCollection;
+
+    foreach ($entries as $Entry) {
+      $StatusCollection->$type->add($Entry);
+    }
+  }
+}
+$Employee->status = $StatusCollection;
+
+// Create and render View
+$View = new StatusView($Employee);
 $View->render();

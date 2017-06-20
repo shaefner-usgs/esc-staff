@@ -4,16 +4,14 @@
  * Employee view - creates the HTML for employee.php
  *
  * @param $employee {Employee instance}
- * @param $statusEntries {Array}
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
 class EmployeeView {
-  private $_employee, $_statusEntries;
+  private $_employee;
 
-  public function __construct (Employee $employee, $statusEntries) {
+  public function __construct (Employee $employee) {
     $this->_employee = $employee;
-    $this->_statusEntries = $statusEntries;
   }
 
   /**
@@ -96,18 +94,29 @@ class EmployeeView {
   }
 
   /**
+   * Create HTML for 'set status' link
+   *
+   * @return {String}
+   */
+  private function _getSetStatusLink () {
+    return sprintf('<p><a href="/contact/staff/%s/status/">Set status</a> &raquo;</p>',
+      $this->_employee->shortname
+    );
+  }
+
+  /**
    * Create HTML for status entries
    *
    * @return $html {String}
    */
   private function _getStatusEntries () {
-    $statusEntries = $this->_statusEntries;
+    $statusEntries = $this->_employee->status;
 
     $html = '';
-    if ($statusEntries['current']) {
-      foreach ($statusEntries['current'] as $Status) {
-        $html .= $Status->getHtml('current');
-      }
+
+    // Current
+    if (property_exists($statusEntries, 'current')) {
+      $html .= $this->_employee->getStatusNow()->getHtml('current');
     } else {
       // Create default status if no current status is set
       $Status = new Status(array(
@@ -117,20 +126,15 @@ class EmployeeView {
       $html .= $Status->getHtml('current');
     }
 
-    if ($statusEntries['future']) {
+    // Future
+    if (property_exists($statusEntries, 'future')) {
       $html .= '<h2>Future Plans</h2>';
-      foreach ($statusEntries['future'] as $Status) {
-        $html .= $Status->getHtml('future');
+      foreach ($statusEntries->future->entries as $Entry) {
+        $html .= $Entry->getHtml('future');
       }
     }
 
     return $html;
-  }
-
-  private function _getSetStatusLink () {
-    return sprintf('<p><a href="/contact/staff/%s/status/">Set status</a> &raquo;</p>',
-      $this->_employee->shortname
-    );
   }
 
   /**

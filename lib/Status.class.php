@@ -1,9 +1,9 @@
 <?php
-  
+
 date_default_timezone_set('America/Los_Angeles');
 
 /**
- * Model for ESC Employee Status Entry
+ * Model for Employee Status Entry
  *
  * @params $params {Array}
  *     key-value pairs to assign as properties to a new instance (also uses magic
@@ -22,7 +22,7 @@ class Status {
     // from database when using PDO::FETCH_CLASS to instantiate
     if (is_array($params)) {
       foreach ($params as $key=>$value) {
-        
+
         // Set begin / end dates to format expected by db schema
         if ($key === 'begin' && $value !== '') {
           $value = date('Y-m-d', strtotime($params['begin']));
@@ -31,7 +31,7 @@ class Status {
           // Indefinite - prob. not nec. to check b/c 'end' should be disabled and therefore not included in $_POST
           if (isset($params['indefinite']) && $params['indefinite'] === 'true') {
             $value = NULL;
-          } 
+          }
           // No end date set; default to begin date
           else if ($params['end'] === '') {
         	  $value = date('Y-m-d', strtotime($params['begin']));
@@ -44,7 +44,7 @@ class Status {
         $this->_data[$key] = $value;
       }
     }
-    // Be certain all req'd fields exist (if not, create and set to NULL values)
+    // Be certain all req'd fields exist (if not, create and set values to NULL)
     foreach ($reqFields as $field) {
       if (!array_key_exists($field, $this->_data)) {
         // Must be set to NULL so that 'end' is NULL in db when not set
@@ -136,7 +136,7 @@ class Status {
    *
    * @param $type {String <past | current | future>
    * @param $showButtons {Boolean}
-   *     controls whether or not edit / delete buttons are created
+   *     Controls whether or not edit / delete buttons are created
    *
    * @return $html {String}
    */

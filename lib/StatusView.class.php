@@ -4,21 +4,18 @@
  * Status view - creates the HTML for status.php
  *
  * @param $employee {Employee instance}
- * @param $statusEntries {Array}
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
-
 class StatusView {
-  private $_employee, $_statusEntries, $_view;
+  private $_employee, $_view;
 
-  public function __construct (Employee $employee, $statusEntries) {
+  public function __construct (Employee $employee) {
     $this->_employee = $employee;
-    $this->_statusEntries = $statusEntries;
 
     // determine view mode (add or edit)
     $this->_view = 'add';
-    if (array_key_exists('edit', $this->_statusEntries)) {
+    if (property_exists($this->_employee->status, 'edit')) {
       $this->_view = 'edit';
     }
   }
@@ -33,8 +30,8 @@ class StatusView {
   }
 
   /**
-   * Create HTML for delete modal (added to bottom of page in Foundation framework)
-   *   Links and details added by JavaScript
+   * Create (generic) HTML for delete modal (links and details added via JavaScript)
+   *   (added to bottom of page per Foundation framework)
    *
    * return html {String}
    */
@@ -72,7 +69,7 @@ class StatusView {
 
     // If editing an entry, use its Status instance; otherwise create a new one
     if ($this->_view === 'edit') {
-      $Status = $this->_statusEntries['edit'];
+      $Status = $this->_employee->status->edit->entries[0]; // there's only ever 1 edit entry
     } else {
       $Status = new Status(array('id' => NULL));
     }
@@ -135,10 +132,10 @@ class StatusView {
 
     return $html;
   }
-  
+
   /**
    * Create HTML for maintenance message
-   *   shows message that system is under maintenance w/ auto-generated timestamp
+   *   shows a message that system is under maintenance w/ auto-generated timestamp
    *
    * @return $html {String}
    */
@@ -149,7 +146,7 @@ class StatusView {
         Currently under maintenance <em>' . $datetime. '</em>
       </div>
       <p>Please check back in 15-30 minutes. </p>';
-    
+
     return $html;
   }
 
@@ -182,15 +179,16 @@ class StatusView {
    * @return $html {String}
    */
   private function _getStatusEntries () {
-    $statusEntries = $this->_statusEntries;
+    $statusEntries = $this->_employee->status;
 
     $html = '<h2>Currently</h2>';
-    if ($statusEntries['current']) {
-      foreach ($statusEntries['current'] as $Status) {
-        $html .= $Status->getHtml('current', 'actionButtons');
+
+    // Current
+    if (property_exists($statusEntries, 'current')) {
+      foreach ($statusEntries->current->entries as $Entry) {
+        $html .= $Entry->getHtml('current', 'actionButtons');
       }
-    } else {
-      // Create default status if no current status is set
+    } else { // create default status if no current status is set
       $Status = new Status(array(
         'status' => 'in the office',
         'timespan' => '(Default setting)'
@@ -198,17 +196,19 @@ class StatusView {
       $html .= $Status->getHtml('current');
     }
 
-    if ($statusEntries['future']) {
+    // Future
+    if (property_exists($statusEntries, 'future')) {
       $html .= '<h2>Future Plans</h2>';
-      foreach ($statusEntries['future'] as $Status) {
-        $html .= $Status->getHtml('future', 'actionButtons');
+      foreach ($statusEntries->future->entries as $Entry) {
+        $html .= $Entry->getHtml('future', 'actionButtons');
       }
     }
 
-    if ($statusEntries['past']) {
+    // Past
+    if (property_exists($statusEntries, 'past')) {
       $html .= '<h2>Past</h2>';
-      foreach ($statusEntries['past'] as $Status) {
-        $html .= $Status->getHtml('past', 'actionButtons');
+      foreach ($statusEntries->past->entries as $Entry) {
+        $html .= $Entry->getHtml('past', 'actionButtons');
       }
     }
 
@@ -218,16 +218,16 @@ class StatusView {
   /**
    * Create HTML for page subtitle
    *
-   * @return $h2 {String}
+   * @return $html {String}
    */
   private function _getSubTitle () {
     if ($this->_view === 'add') {
-      $h2 = '<h2>Create New Entry</h2>';
+      $html = '<h2>Create New Entry</h2>';
     } else {
-      $h2 = '<h2>Edit Entry</h2>';
+      $html = '<h2>Edit Entry</h2>';
     }
 
-    return $h2;
+    return $html;
   }
 
   public function render () {
