@@ -13,7 +13,7 @@ class StatusCollection {
   }
 
   /**
-   * Add a status entry to the Collection
+   * Add a Status instance to the Collection
    *
    * @param $Status {Object}
    */
