@@ -29,7 +29,7 @@ class Db {
    * @param $sql {String}
    *     SQL query
    * @param $params {Array} default is NULL
-   *     key-value substitution params for SQL query
+   *     Key-value substitution params for SQL query
    *
    * @return $stmt {Object} - PDOStatement object
    */
@@ -64,17 +64,17 @@ class Db {
 
   /**
    * Manually format fields/placeholders for MySQL SET clause
-   *   from: https://phpdelusions.net/pdo
+   *   inspired by: https://phpdelusions.net/pdo
    *
-   * @param $data {Array}
-   *     key-value pairs for query
+   * @param $params {Array}
+   *     Key-value pairs for query
    *
    * @return $setClause {String}
    */
-  private function _getSetClause ($data) {
+  private function _getSetClause ($params) {
     $setClause = 'SET ';
 
-    foreach ($data as $field => $value) {
+    foreach ($params as $field => $value) {
       $setClause .= '`' . str_replace('`', '``', $field) . '`' . "=:$field, ";
     }
     $setClause = substr($setClause, 0, -2); // strip final ','
@@ -86,19 +86,19 @@ class Db {
    * Take an array of SQL fields and return a comma-separated string with fields
    *   enclosed in backticks
    *
-   * @param $array {Array}
+   * @param $fields {Array}
    *
    * @return {String}
    */
-  private function _getSqlFieldList ($array) {
-    return '`' . implode('`, `', $array) . '`';
+  private function _getSqlFieldList ($fields) {
+    return '`' . implode('`, `', $fields) . '`';
   }
 
   /**
    * Get data type for a sql parameter (PDO::PARAM_* constant)
    *
    * @param $var {?}
-   *     variable to identify type of
+   *     Variable to identify type of
    *
    * @return $type {Integer}
    */
