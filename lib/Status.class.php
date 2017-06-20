@@ -34,7 +34,7 @@ class Status {
           }
           // No end date set; default to begin date
           else if ($params['end'] === '') {
-        	  $value = date('Y-m-d', strtotime($params['begin']));
+            $value = date('Y-m-d', strtotime($params['begin']));
           }
           else {
             $value = date('Y-m-d', strtotime($params['end']));
@@ -155,47 +155,47 @@ class Status {
     $actionButtons = '';
     if ($showButtons && strtolower($this->_data['status']) !== 'in the office') {
       $actionButtons = sprintf('<ul class="actions">
-		      <li>
-		        <a href="/contact/staff/%s/status/%d/" class="radius button tiny secondary">Edit</a>
-		      </li>
+          <li>
+            <a href="/contact/staff/%s/status/%d/" class="radius button tiny secondary">Edit</a>
+          </li>
           <li>
             <a href="/contact/staff/%s/status/%d/delete/" class="delete radius button tiny secondary">Delete</a>
           </li>
-		    </ul>',
-		    $this->_data['shortname'],
-		    $this->_data['id'],
-		    $this->_data['shortname'],
-		    $this->_data['id']
-		  );
+        </ul>',
+        $this->_data['shortname'],
+        $this->_data['id'],
+        $this->_data['shortname'],
+        $this->_data['id']
+      );
     }
 
-		$html = sprintf('<div class="alert-box %s">%s <em>%s</em>%s</div>',
-		  $cssClass,
-		  ucfirst($this->_data['status']),
-		  $this->getTimeSpan(),
-		  $actionButtons
-		);
+    $html = sprintf('<div class="alert-box %s">%s <em>%s</em>%s</div>',
+      $cssClass,
+      ucfirst($this->_data['status']),
+      $this->getTimeSpan(),
+      $actionButtons
+    );
 
-		if ($this->_data['contact'] && $this->_data['status'] !== 'annual leave') {
-			$trs .= sprintf('<tr><th>Contact info</th><td>%s</td></tr>',
-			  $this->_data['contact']
-			 );
-		}
-		if ($this->_data['backup'] && $this->_data['status'] !== 'working at home') {
-			$trs .= sprintf('<tr><th>Backup person</th><td>%s</td></tr>',
+    if ($this->_data['contact'] && $this->_data['status'] !== 'annual leave') {
+      $trs .= sprintf('<tr><th>Contact info</th><td>%s</td></tr>',
+        $this->_data['contact']
+       );
+    }
+    if ($this->_data['backup'] && $this->_data['status'] !== 'working at home') {
+      $trs .= sprintf('<tr><th>Backup person</th><td>%s</td></tr>',
         $this->_data['backup']
       );
-		}
-		if ($this->_data['comments']) {
-			$trs .= sprintf('<tr><th>Comments</th><td>%s</td></tr>',
-			  $this->_data['comments']
-			 );
-		}
-		if ($trs) {
-			$html .= sprintf('<table class="status">%s</table>', $trs);
-		}
+    }
+    if ($this->_data['comments']) {
+      $trs .= sprintf('<tr><th>Comments</th><td>%s</td></tr>',
+        $this->_data['comments']
+       );
+    }
+    if ($trs) {
+      $html .= sprintf('<table class="status">%s</table>', $trs);
+    }
 
-	  return $html;
+    return $html;
   }
 
   /**
@@ -219,44 +219,44 @@ class Status {
       $beginTimestamp = strtotime($begin);
       $endTimestamp =strtotime($end);
 
-  		$currentYear = date('Y');
+      $currentYear = date('Y');
       $beginYear = date('Y', strtotime($begin));
-  		$endYear = date('Y', strtotime($end));
+      $endYear = date('Y', strtotime($end));
       $multYears = false;
-  		if ($beginYear !== $endYear) {
-  			$multYears = true;
-  		}
+      if ($beginYear !== $endYear) {
+        $multYears = true;
+      }
 
-  		$dateFormat = 'F j';
-  		if ($multYears || !$end) { // add year if status spans mult. years or indefinite
-  			$dateFormat .= ', Y';
-  		}
+      $dateFormat = 'F j';
+      if ($multYears || !$end) { // add year if status spans mult. years or indefinite
+        $dateFormat .= ', Y';
+      }
 
-  		if ($end) { // end date specified
-  			$beginMonth = date('Y-m', $beginTimestamp); // month with year prepended
-  			$endMonth = date('Y-m', $endTimestamp); // month with year prepended
+      if ($end) { // end date specified
+        $beginMonth = date('Y-m', $beginTimestamp); // month with year prepended
+        $endMonth = date('Y-m', $endTimestamp); // month with year prepended
 
-  			// Start with begin date
-  			$timespan = date($dateFormat, $beginTimestamp);
+        // Start with begin date
+        $timespan = date($dateFormat, $beginTimestamp);
 
-  			// Add end date (if same month and year, shorten end date to just the day)
-  			if ($begin !== $end) {
-  				if ($beginMonth === $endMonth && !$multYears) {
-  					$dateFormat = 'j';
-  				}
-  				$timespan .= '&ndash;' . date($dateFormat, $endTimestamp);
-  			}
+        // Add end date (if same month and year, shorten end date to just the day)
+        if ($begin !== $end) {
+          if ($beginMonth === $endMonth && !$multYears) {
+            $dateFormat = 'j';
+          }
+          $timespan .= '&ndash;' . date($dateFormat, $endTimestamp);
+        }
 
-  			// include year for past events that don't already have it (already included if date range spans mult. years)
-  			if ($currentYear !== $endYear && !$multYears) {
-  				$timespan .= ', ' . $endYear;
-  			}
-  		}
-  		else { // no end date specified (indefinite)
-  			$timespan = 'Indefinite, beginning ' . date($dateFormat, $beginTimestamp);
-  		}
+        // include year for past events that don't already have it (already included if date range spans mult. years)
+        if ($currentYear !== $endYear && !$multYears) {
+          $timespan .= ', ' . $endYear;
+        }
+      }
+      else { // no end date specified (indefinite)
+        $timespan = 'Indefinite, beginning ' . date($dateFormat, $beginTimestamp);
+      }
     }
 
-		return $timespan;
+    return $timespan;
   }
 }

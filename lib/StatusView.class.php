@@ -40,8 +40,8 @@ class StatusView {
         <h2>Delete Entry?</h2>
         <p></p>
         <ul class="actions">
-        	<li><a id="cancel" class="radius button secondary">Cancel</a></li>
-        	<li><a id="delete" class="radius button alert">Delete</a></li>
+          <li><a id="cancel" class="radius button secondary">Cancel</a></li>
+          <li><a id="delete" class="radius button alert">Delete</a></li>
         </ul>
       </div>';
 
@@ -88,8 +88,8 @@ class StatusView {
     $html = sprintf('<form action="/contact/staff/%s/status/" name="form1" id="form1"
       method="post" enctype="application/x-www-form-urlencoded">
         <label for="status">Status</label>
-      	<select id="status" name="status" required>
-      		<option value="">Choose&hellip;</option>
+        <select id="status" name="status" required>
+          <option value="">Choose&hellip;</option>
           %s
         </select>
         <label for="begin">
@@ -102,20 +102,20 @@ class StatusView {
           <input name="indefinite" id="indefinite" type="checkbox" value="true"%s />
           <label for="indefinite">Indefinite</label>
         </span>
-      	<div id="option-contact">
-      		<label for="contact">Location & contact info <em>Include city, hotel, etc.</em></label>
-      		<textarea name="contact" id="contact" rows="2" cols="40">%s</textarea>
-      	</div>
-      	<div id="option-backup">
-      		<label for="backup">Backup person</label>
-      		<input name="backup" id="backup" type="text" value="%s" size="40" maxlength="64" />
-      	</div>
-      	<label for="comments">Comments</label>
-      	<textarea name="comments" id="comments" rows="3" cols="40">%s</textarea>
-      	<input name="action" id="action" type="hidden" value="%s" />
-      	<input name="id" id="id" type="hidden" value="%s" />
-      	<input name="shortname" id="shortname" type="hidden" value="%s" />
-      	<button name="submit" id="submit" type="submit" class="radius button success">Set Status</button>
+        <div id="option-contact">
+          <label for="contact">Location & contact info <em>Include city, hotel, etc.</em></label>
+          <textarea name="contact" id="contact" rows="2" cols="40">%s</textarea>
+        </div>
+        <div id="option-backup">
+          <label for="backup">Backup person</label>
+          <input name="backup" id="backup" type="text" value="%s" size="40" maxlength="64" />
+        </div>
+        <label for="comments">Comments</label>
+        <textarea name="comments" id="comments" rows="3" cols="40">%s</textarea>
+        <input name="action" id="action" type="hidden" value="%s" />
+        <input name="id" id="id" type="hidden" value="%s" />
+        <input name="shortname" id="shortname" type="hidden" value="%s" />
+        <button name="submit" id="submit" type="submit" class="radius button success">Set Status</button>
       </form>',
       $this->_employee->shortname,
       $optionTags,
@@ -161,7 +161,7 @@ class StatusView {
   private function _getOptionTag ($status, $selectedStatus) {
     $selected = '';
     if ($status === $selectedStatus) {
-    	$selected .= ' selected="selected"';
+      $selected .= ' selected="selected"';
     }
 
     $html = sprintf('<option%s value="%s">%s</option>',

@@ -22,16 +22,16 @@ class IndexView {
    */
   private function _getCallout () {
     $html = '<div class="panel radius">
-    	<h3>See Also</h3>
-    	<ul class="disc">
-      	<li><a href="https://www2.usgs.gov/phonebook/employee/">USGS Employee Phonebook</a></li>
-    		<li><a href="https://www.usgs.gov/connect/staff-profiles">USGS Staff Profiles</a>
-    		  (<a href="https://sites.google.com/a/usgs.gov/web-reengineering/staff-profiles/staff-profile-access/about-staff-profiles">Request
-    		    access to edit your page</a>)
-    		</li>
-    		<li><a href="https://www.usgs.gov/connect/locations">USGS Offices and Science Centers</a></li>
-    		<li><a href="https://www.usgs.gov/about/key-officials">USGS Directory of Key Officials</a></li>
-    	</ul>
+      <h3>See Also</h3>
+      <ul class="disc">
+        <li><a href="https://www2.usgs.gov/phonebook/employee/">USGS Employee Phonebook</a></li>
+        <li><a href="https://www.usgs.gov/connect/staff-profiles">USGS Staff Profiles</a>
+          (<a href="https://sites.google.com/a/usgs.gov/web-reengineering/staff-profiles/staff-profile-access/about-staff-profiles">Request
+            access to edit your page</a>)
+        </li>
+        <li><a href="https://www.usgs.gov/connect/locations">USGS Offices and Science Centers</a></li>
+        <li><a href="https://www.usgs.gov/about/key-officials">USGS Directory of Key Officials</a></li>
+      </ul>
     </div>';
 
     return $html;
