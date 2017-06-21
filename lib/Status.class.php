@@ -19,26 +19,7 @@ class Status {
     // Params passed to constructor will override corresponding key-value pairs
     // from database when using PDO::FETCH_CLASS to instantiate
     if (is_array($params)) {
-      foreach ($params as $key=>$value) {
-
-        // Set begin / end dates to format expected by db schema
-        if ($key === 'begin' && $value !== '') {
-          $value = date('Y-m-d', strtotime($params['begin']));
-        }
-        if ($key === 'end') {
-          // Indefinite - prob. not nec. to check b/c 'end' should be disabled and therefore not included in $_POST
-          if (isset($params['indefinite']) && $params['indefinite'] === 'true') {
-            $value = NULL;
-          }
-          // No end date set; default to begin date
-          else if ($params['end'] === '') {
-            $value = date('Y-m-d', strtotime($params['begin']));
-          }
-          else {
-            $value = date('Y-m-d', strtotime($params['end']));
-          }
-        }
-
+      foreach ($params as $key => $value) {
         $this->_data[$key] = $value;
       }
     }
@@ -61,6 +42,7 @@ class Status {
 
   /**
    * Only keep fields which user is allowed to manipulate (via web form)
+   *   also sets date values to format expected by db schema
    *
    * @return $keep {Array}
    */
@@ -70,6 +52,25 @@ class Status {
     );
 
     foreach ($this->_data as $key => $value) {
+      // Set begin / end dates to correct format
+      if ($key === 'begin' && $value) {
+        $value = date('Y-m-d', strtotime($this->_data['begin']));
+      }
+      if ($key === 'end') {
+        // Indefinite, set 'end' to NULL
+        if (isset($this->_data['indefinite']) && $this->_data['indefinite'] === 'true') {
+          $value = NULL;
+        }
+        // No end date set; default to begin date
+        else if ($this->_data['end'] === '') {
+          $value = date('Y-m-d', strtotime($this->_data['begin']));
+        }
+        else {
+          $value = date('Y-m-d', strtotime($this->_data['end']));
+        }
+      }
+
+      // Only keep 'allowed' fields
       if (in_array($key, $allowedFields)) {
         $keep[$key] = $value;
       }
