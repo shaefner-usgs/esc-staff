@@ -213,6 +213,7 @@ class Db {
    * @return {Function}
    */
   public function selectStatusEntries ($shortname=NULL, $filter='current') {
+    $orderbyClause = 'ORDER BY `shortname` ASC';
     $whereClause = 'WHERE `deleted` = 0'; // not deleted by user
 
     // Get status entries for a specific employee
@@ -222,14 +223,14 @@ class Db {
     }
 
     if ($filter === 'recurring') {
-      $orderbyClause = 'ORDER BY `shortname` ASC';
+      $orderbyClause .= ', `changed` ASC';
       $timePeriodFields = $this->_getSqlFieldList(
         array('monday', 'tuesday', 'wednesday', 'thursday', 'friday')
       );
       $whereClause .= ' AND `recurring` = 1';
     }
     else {
-      $orderbyClause = 'ORDER BY `shortname` ASC, `begin` ASC';
+      $orderbyClause .= ', `begin` ASC, `changed` ASC';
       $params['today'] = date('Y-m-d');
       $timePeriodFields = $this->_getSqlFieldList(array('begin', 'end'));
       $whereClause .= ' AND `recurring` = 0';
