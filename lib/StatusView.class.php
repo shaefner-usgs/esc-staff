@@ -207,6 +207,7 @@ class StatusView {
     // Past
     if (property_exists($statusEntries, 'past')) {
       $html .= '<h2>Past</h2>';
+      $statusEntries->past->sort('DESC');
       foreach ($statusEntries->past->entries as $Entry) {
         $html .= $Entry->getHtml('past', 'actionButtons');
       }
