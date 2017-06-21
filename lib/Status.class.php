@@ -139,14 +139,14 @@ class Status {
    *
    * @return $html {String}
    */
-  public function getHtml ($type, $showButtons=false) {
+  public function getHtml ($showButtons=false) {
     $trs = '';
     $cssClass = '';
 
-    if ($type === 'future') {
+    if ($this->_data['type'] === 'future') {
       $cssClass = 'secondary future';
     }
-    else if ($type === 'past') {
+    else if ($this->_data['type'] === 'past') {
       $cssClass = 'secondary past';
     }
 

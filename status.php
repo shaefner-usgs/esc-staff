@@ -58,9 +58,15 @@ if ($view === 'add') { // default view: show add form + list of status entries
   $rsStatusEntriesPast = $Db->selectStatusEntries($shortname, 'past');
 
   // Create a Status instance for each entry
-  $statusEntries['current'] = $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status');
-  $statusEntries['future'] = $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status');
-  $statusEntries['past'] = $rsStatusEntriesPast->fetchall(PDO::FETCH_CLASS, 'Status');
+  $statusEntries['current'] = $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status',
+    array(array('type' => 'current'))
+  );
+  $statusEntries['future'] = $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status',
+    array(array('type' => 'future'))
+  );
+  $statusEntries['past'] = $rsStatusEntriesPast->fetchall(PDO::FETCH_CLASS, 'Status',
+    array(array('type' => 'past'))
+  );
 }
 else if ($view === 'edit') { // edit entry view: show edit form containing entry
   // Create a Status instance for entry user is editing

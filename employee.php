@@ -31,8 +31,12 @@ $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
 
 // Create a Status instance for each entry
 $statusEntries = array(
-  'current' => $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status'),
-  'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status')
+  'current' => $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status',
+    array(array('type' => 'current'))
+  ),
+  'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status',
+    array(array('type' => 'future'))
+  )
 );
 
 // Group status entries into Collections by type

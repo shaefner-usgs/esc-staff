@@ -116,21 +116,22 @@ class EmployeeView {
 
     // Current
     if (property_exists($statusEntries, 'current')) {
-      $html .= $this->_employee->getStatusNow()->getHtml('current');
+      $html .= $this->_employee->getStatusNow()->getHtml();
     } else {
       // Create default status if no current status is set
       $Status = new Status(array(
         'status' => 'in the office',
-        'timespan' => 'Today'
+        'timespan' => 'Today',
+        'type' => 'current'
       ));
-      $html .= $Status->getHtml('current');
+      $html .= $Status->getHtml();
     }
 
     // Future
     if (property_exists($statusEntries, 'future')) {
       $html .= '<h2>Future Plans</h2>';
       foreach ($statusEntries->future->entries as $Entry) {
-        $html .= $Entry->getHtml('future');
+        $html .= $Entry->getHtml();
       }
     }
 

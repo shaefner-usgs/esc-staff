@@ -186,21 +186,22 @@ class StatusView {
     // Current
     if (property_exists($statusEntries, 'current')) {
       foreach ($statusEntries->current->entries as $Entry) {
-        $html .= $Entry->getHtml('current', 'actionButtons');
+        $html .= $Entry->getHtml('showButtons');
       }
     } else { // create default status if no current status is set
       $Status = new Status(array(
         'status' => 'in the office',
-        'timespan' => '(Default setting)'
+        'timespan' => '(Default setting)',
+        'type' => 'current'
       ));
-      $html .= $Status->getHtml('current');
+      $html .= $Status->getHtml();
     }
 
     // Future
     if (property_exists($statusEntries, 'future')) {
       $html .= '<h2>Future Plans</h2>';
       foreach ($statusEntries->future->entries as $Entry) {
-        $html .= $Entry->getHtml('future', 'actionButtons');
+        $html .= $Entry->getHtml('showButtons');
       }
     }
 
@@ -209,7 +210,7 @@ class StatusView {
       $html .= '<h2>Past</h2>';
       $statusEntries->past->sort('DESC');
       foreach ($statusEntries->past->entries as $Entry) {
-        $html .= $Entry->getHtml('past', 'actionButtons');
+        $html .= $Entry->getHtml('showButtons');
       }
     }
 
