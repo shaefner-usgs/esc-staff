@@ -68,7 +68,7 @@ else if ($view === 'edit') { // edit entry view: show edit form containing entry
   $rsStatusEntry->setFetchMode(PDO::FETCH_CLASS, 'Status');
   $Status = $rsStatusEntry->fetch();
 
-  $statusEntries['edit'] = array($Status);
+  $statusEntries['edit'] = array($Status); // use array to match types w/ multiple entries
 }
 
 // Group status entries into Collections by type
