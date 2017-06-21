@@ -3,7 +3,7 @@
 /**
  * Employee view - creates the HTML for employee.php
  *
- * @param $employee {Employee instance}
+ * @param $employee {Object: Employee instance}
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */

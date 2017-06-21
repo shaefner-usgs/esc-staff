@@ -82,7 +82,7 @@ class Status {
   /**
    * Add a status entry to the db
    *
-   * @param $Db {Db Class instance}
+   * @param $Db {Object: Db instance}
    */
   public function add ($Db) {
     $data = $this->_filterSqlData();
@@ -93,7 +93,7 @@ class Status {
   /**
    * Delete a status entry from the db
    *
-   * @param $Db {Db Class instance}
+   * @param $Db {Object: Db instance}
    */
   public function delete ($Db) {
     $id = $this->_data['id'];
@@ -104,7 +104,7 @@ class Status {
   /**
    * Edit a status entry in the db
    *
-   * @param $Db {Db Class instance}
+   * @param $Db {Object: Db instance}
    */
   public function edit ($Db) {
     $data = $this->_filterSqlData();

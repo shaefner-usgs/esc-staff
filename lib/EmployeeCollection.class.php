@@ -16,7 +16,7 @@ class EmployeeCollection {
   /**
    * Add an Employee instance to the Collection
    *
-   * @param $Employee {Object}
+   * @param $Employee {Object: Employee instance}
    */
   public function add ($Employee) {
     $this->employees[] = $Employee;

@@ -3,7 +3,7 @@
 /**
  * Status view - creates the HTML for status.php
  *
- * @param $employee {Employee instance}
+ * @param $employee {Object: Employee instance}
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
