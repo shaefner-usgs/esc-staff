@@ -80,7 +80,7 @@ class Status {
   }
 
   /**
-   * Add a status entry to the db
+   * Add status entry to the db
    *
    * @param $Db {Object: Db instance}
    */
@@ -91,7 +91,7 @@ class Status {
   }
 
   /**
-   * Delete a status entry from the db
+   * Delete status entry from the db
    *
    * @param $Db {Object: Db instance}
    */
@@ -102,7 +102,7 @@ class Status {
   }
 
   /**
-   * Edit a status entry in the db
+   * Edit status entry in the db
    *
    * @param $Db {Object: Db instance}
    */
@@ -121,13 +121,9 @@ class Status {
    * @return $formatted {String}
    */
   public function formatDate ($date) {
-    $formatted = '';
-
     if ($date) {
-      $formatted = date('m/d/Y', strtotime($date));
+      return date('m/d/Y', strtotime($date));
     }
-
-    return $formatted;
   }
 
   /**
