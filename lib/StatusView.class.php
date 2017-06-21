@@ -185,8 +185,14 @@ class StatusView {
 
     // Current
     if (property_exists($statusEntries, 'current')) {
+      $StatusNow = $this->_employee->getStatusNow();
       foreach ($statusEntries->current->entries as $Entry) {
-        $html .= $Entry->getHtml('showButtons');
+        if (count($statusEntries->current->entries) > 1 && $Entry === $StatusNow) {
+          // Indicate 'active' status to user
+          $html .= $Entry->getHtml('showButtons', 'active');
+        } else {
+          $html .= $Entry->getHtml('showButtons');
+        }
       }
     } else { // create default status if no current status is set
       $Status = new Status(array(

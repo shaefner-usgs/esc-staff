@@ -133,25 +133,20 @@ class Status {
   /**
    * Create HTML for status entry
    *
-   * @param $type {String <past | current | future>
    * @param $showButtons {Boolean}
    *     Controls whether or not edit / delete buttons are created
+   * @param $active {Boolean}
+   *     Controls whether or not a checkmark is displayed to indicate active state
    *
    * @return $html {String}
    */
-  public function getHtml ($showButtons=false) {
-    $trs = '';
+  public function getHtml ($showButtons=false, $active=false) {
+    $actionButtons = '';
+    $checkmark = '';
     $cssClass = '';
-
-    if ($this->_data['type'] === 'future') {
-      $cssClass = 'secondary future';
-    }
-    else if ($this->_data['type'] === 'past') {
-      $cssClass = 'secondary past';
-    }
+    $trs = '';
 
     // Create 'Edit' and 'Delete' buttons
-    $actionButtons = '';
     if ($showButtons && strtolower($this->_data['status']) !== 'in the office') {
       $actionButtons = sprintf('<ul class="actions">
           <li>
@@ -168,9 +163,21 @@ class Status {
       );
     }
 
-    $html = sprintf('<div class="alert-box %s">%s <em>%s</em>%s</div>',
+    if ($active) {
+      $checkmark = '<i class="fa fa-check" aria-hidden="true"></i>';
+    }
+
+    if ($this->_data['type'] === 'future') {
+      $cssClass = 'secondary future';
+    }
+    else if ($this->_data['type'] === 'past') {
+      $cssClass = 'secondary past';
+    }
+
+    $html = sprintf('<div class="alert-box %s">%s %s <em>%s</em>%s</div>',
       $cssClass,
       ucfirst($this->_data['status']),
+      $checkmark,
       $this->getTimeSpan(),
       $actionButtons
     );
