@@ -28,6 +28,7 @@ if (!isset($TEMPLATE)) {
 // Query database to get employee's status entries
 $rsStatusEntriesCurrent = $Db->selectStatusEntries($shortname);
 $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
+$rsStatusEntriesRec = $Db->selectStatusEntries($shortname, 'recurring');
 
 // Create a Status instance for each entry
 $statusEntries = array(
@@ -36,6 +37,9 @@ $statusEntries = array(
   ),
   'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status',
     array(array('type' => 'future'))
+  ),
+  'recurring' => $rsStatusEntriesRec->fetchall(PDO::FETCH_CLASS, 'Status',
+    array(array('type' => 'recurring'))
   )
 );
 

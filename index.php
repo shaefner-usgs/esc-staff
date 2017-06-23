@@ -22,13 +22,15 @@ $sortBy = safeParam('sortby', 'name');
 $Db = new Db;
 $rsEmployees = $Db->selectEmployees();
 $rsStatusEntriesCurrent = $Db->selectStatusEntries();
+$rsStatusEntriesRec = $Db->selectStatusEntries(NULL, 'recurring');
 
 // Create an Employee instance for each employee
 $employees = $rsEmployees->fetchAll(PDO::FETCH_CLASS, 'Employee');
 
 // Index status entries by employee shortname (1st column in query)
 $statusEntries = array(
-  'current' => $rsStatusEntriesCurrent->fetchAll(PDO::FETCH_GROUP)
+  'current' => $rsStatusEntriesCurrent->fetchAll(PDO::FETCH_GROUP),
+  'recurring' => $rsStatusEntriesRec->fetchAll(PDO::FETCH_GROUP)
 );
 
 // Create a Collection of Employees (including thier 'current' status entries)

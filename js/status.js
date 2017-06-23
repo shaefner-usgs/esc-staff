@@ -28,19 +28,17 @@
 
     // show / hide fields based on status selection
     swapFields();
+    $('#status').on('change', swapFields);
 
-    $('#status').on('change', function() {
-      swapFields();
-    });
+    // show / hide date / days based on recurring selection
+    swapType();
+    $('#recurring').on('change', swapType)
 
     // disable 'to' field when indefinite is checked
     if ($('#indefinite').is(':checked')) {
       disableToField();
     }
-
-    $('#indefinite').on('change', function() {
-      disableToField();
-    });
+    $('#indefinite').on('change', disableToField);
 
     // set up date picker
     $.datepicker.setDefaults({
@@ -71,7 +69,7 @@
       }
     });
 
-    // require status, date fields
+    // require status, date / day fields
     $('#submit').on('click', function(e) {
       $('input, select').removeClass('error');
       $('p.error').remove();
@@ -79,10 +77,10 @@
         show_error = function(elem, msg) {
           e.preventDefault();
           $(elem).addClass('error');
-          if (elem === '#status') {
-            selector = elem;
-          } else {
+          if (elem === '#begin') {
             selector = '#forever';
+          } else {
+            selector = elem;
           }
           $(selector).after('<p class="error">' + msg + '</p>');
         };
@@ -90,11 +88,23 @@
       if (!$('#end').val() && !$('#indefinite').is(':checked')) {
         //show_error('#end', 'Please enter an end date');
       }
-      if (!$('#begin').val()) {
-        show_error('#begin', 'Please enter a beginning date');
+      if (!$('#begin').val() && !$('#recurring').is(':checked')) {
+        show_error('#begin', 'Enter a beginning date');
+      }
+      if ($('#recurring').is(':checked')) {
+        var checked = false;
+        var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        days.forEach(function (day) {
+          if ($('#' + day).is(':checked')) {
+            checked = true;
+          }
+        });
+        if (!checked) {
+          show_error('#option-days', 'Select at least 1 day');
+        }
       }
       if (!$('#status option:selected').val()) {
-        show_error('#status', 'Please select a status');
+        show_error('#status', 'Select a status');
       }
     });
   };
@@ -124,5 +134,15 @@
       $('#backup').attr('disabled', 'disabled');
     }
   };
+
+  var swapType = function () {
+    if ($('#recurring').is(':checked')) {
+      $('#option-dates').css('display', 'none');
+      $('#option-days').css('display', 'block');
+    } else {
+      $('#option-dates').css('display', 'block');
+      $('#option-days').css('display', 'none');
+    }
+  }
 
 })();

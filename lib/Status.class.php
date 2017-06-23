@@ -41,29 +41,34 @@ class Status {
    */
   private function _filterSqlData () {
     $allowedFields = array(
-      'backup', 'begin', 'changed', 'comments', 'contact', 'end', 'ip', 'shortname', 'status'
+      'backup', 'begin', 'changed', 'comments', 'contact', 'end', 'ip',
+      'friday', 'monday', 'recurring', 'shortname', 'status', 'thursday',
+      'tuesday', 'wednesday'
     );
 
-    foreach ($this->_data as $key => $value) {
-      // Set begin / end dates to correct format
-      if ($key === 'begin' && $value) {
-        $value = date('Y-m-d', strtotime($this->_data['begin']));
+    // Set begin / end dates to correct format (NULL or yyyy-mm-dd)
+    $indefinite = isset($this->_data['indefinite']) && $this->_data['indefinite'] === '1';
+    if ($indefinite) {
+      $this->_data['end'] = NULL;
+    } else {
+      if ($this->_data['begin'] && !$this->_data['end']) {
+        // Default to 1 day if no end value set
+        $this->_data['end'] = $this->_data['begin'];
       }
-      if ($key === 'end') {
-        // Indefinite, set 'end' to NULL
-        if (isset($this->_data['indefinite']) && $this->_data['indefinite'] === 'true') {
-          $value = NULL;
-        }
-        // No end date set; default to begin date
-        else if ($this->_data['end'] === '') {
-          $value = date('Y-m-d', strtotime($this->_data['begin']));
-        }
-        else {
-          $value = date('Y-m-d', strtotime($this->_data['end']));
-        }
-      }
+    }
+    if ($this->_data['begin']) {
+      $this->_data['begin'] = date('Y-m-d', strtotime($this->_data['begin']));
+    } else {
+      $this->_data['begin'] = NULL;
+    }
+    if ($this->_data['end']) {
+      $this->_data['end'] = date('Y-m-d', strtotime($this->_data['end']));
+    } else {
+      $this->_data['end'] = NULL;
+    }
 
-      // Only keep 'allowed' fields
+    // Only keep 'allowed' fields
+    foreach ($this->_data as $key => $value) {
       if (in_array($key, $allowedFields)) {
         $keep[$key] = $value;
       }
@@ -73,20 +78,27 @@ class Status {
   }
 
   /**
-   * Be certain all req'd props exist (if not, create and set value to NULL)
+   * Be certain all req'd props exist (if not, create and set value to NULL or 0)
    *   required properties correspond to form fields on add / edit forms
    */
   private function _setRequiredProps () {
-    $reqProps = array('backup', 'begin', 'comments', 'contact', 'end', 'status');
+    $reqProps = array('backup', 'begin', 'comments', 'contact', 'end',
+      'friday', 'monday', 'recurring', 'status', 'thursday', 'tuesday',
+      'wednesday'
+    );
+    $setToZero = array('friday', 'monday', 'recurring', 'thursday', 'tuesday',
+      'wednesday'
+    );
 
-    // Be certain all req'd fields exist (if not, create and set values to NULL)
     foreach ($reqProps as $prop) {
       if (!array_key_exists($prop, $this->_data)) {
-        // Must be set to NULL so that 'end' is NULL in db when not set
-        $this->_data[$prop] = NULL;
+        if (in_array($prop, $setToZero)) {
+          $this->_data[$prop] = 0;
+        } else {
+          $this->_data[$prop] = NULL;
+        }
       }
     }
-
   }
 
   /**
@@ -221,6 +233,22 @@ class Status {
     // If a value was set (during instantiation), return it
     if (isset($this->_data['timespan'])) {
       return $this->_data['timespan'];
+    }
+
+    // For recurring entries, get the list of days that apply
+    if ($this->_data['recurring'] === '1') {
+      $days = array(
+        'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
+      );
+
+      foreach ($days as $day) {
+        if ($this->_data[$day] === '1') {
+          $recDays[] = ucwords($day) . 's';
+        }
+      }
+      if (is_array($recDays)) {
+        $timespan = implode(', ', $recDays);
+      }
     }
 
     // Calculate timespan if entry has at least a begin date

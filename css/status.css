@@ -1,11 +1,21 @@
 @import '_common.css';
 
+/* Override foundation defaults */
+input[type="text"], form > select, textarea {
+  margin: 0;
+}
+
 h1 em {
   display: block;
   font-size: .5em;
   font-style: normal;
   color: #666;
   margin-bottom: -.3em
+}
+
+#begin, #end {
+  width: 10em;
+  display: inline;
 }
 
 #deleteModal ul {
@@ -15,22 +25,31 @@ h1 em {
   font-weight: bold;
 }
 
-#begin, #end {
-  width: 10em;
-  display: inline;
+#select-type {
+  margin-top: 1em;
 }
+
+#submit {
+  margin-top: 1em;
+}
+
+.checkbox label {
+  display: inline-block;
+  margin-right: 1em;
+  white-space: nowrap;
+}
+
+.fieldtitle {
+  color: #4d4d4d;
+  font-weight: 500;
+  margin: 1.25em 0 3px;
+}
+
 .ui-datepicker-calendar td {
   width: 30px;
 }
 
-#forever {
-  white-space: nowrap;
-}
-#forever label {
-  display: inline;
-}
-
 p.error {
   color: #c60f13;
-  margin: -10px 0 10px;
+  margin: 0;
 }

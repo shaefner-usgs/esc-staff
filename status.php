@@ -56,16 +56,22 @@ if ($view === 'add') { // default view: show add form + list of status entries
   $rsStatusEntriesCurrent = $Db->selectStatusEntries($shortname);
   $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
   $rsStatusEntriesPast = $Db->selectStatusEntries($shortname, 'past');
+  $rsStatusEntriesRec = $Db->selectStatusEntries($shortname, 'recurring');
 
   // Create a Status instance for each entry
-  $statusEntries['current'] = $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status',
-    array(array('type' => 'current'))
-  );
-  $statusEntries['future'] = $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status',
-    array(array('type' => 'future'))
-  );
-  $statusEntries['past'] = $rsStatusEntriesPast->fetchall(PDO::FETCH_CLASS, 'Status',
-    array(array('type' => 'past'))
+  $statusEntries = array(
+    'current' => $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status',
+      array(array('type' => 'current'))
+    ),
+    'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status',
+      array(array('type' => 'future'))
+    ),
+    'past' => $rsStatusEntriesPast->fetchall(PDO::FETCH_CLASS, 'Status',
+      array(array('type' => 'past'))
+    ),
+    'recurring' => $rsStatusEntriesRec->fetchall(PDO::FETCH_CLASS, 'Status',
+      array(array('type' => 'recurring'))
+    )
   );
 }
 else if ($view === 'edit') { // edit entry view: show edit form containing entry

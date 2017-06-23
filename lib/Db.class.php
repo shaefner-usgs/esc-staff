@@ -227,7 +227,7 @@ class Db {
     if ($filter === 'recurring') {
       $orderbyClause .= ', `changed` ASC';
       $timePeriodFields = $this->_getSqlFieldList(
-        array('monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+        array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'recurring')
       );
       $whereClause .= ' AND `recurring` = 1';
     }
@@ -269,8 +269,7 @@ class Db {
   public function selectStatusEntryById ($id, $recurring=false) {
     $params['id'] = $id;
 
-    $sql = "SELECT `shortname`, `id`, `status`, `begin`, `end`, `contact`,
-      `backup`, `comments` FROM esc_statusEntries
+    $sql = "SELECT * FROM esc_statusEntries
       WHERE `id` = :id";
 
     return $this->_execQuery($sql, $params);

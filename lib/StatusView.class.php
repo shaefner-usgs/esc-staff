@@ -30,6 +30,28 @@ class StatusView {
   }
 
   /**
+   * Get html snippet for marking a checkbox as checked
+   *
+   * @param $name {String}
+   *   name value of form field
+   *
+   * @return $checked {String}
+   */
+  private function _getCheckedSnippet ($name) {
+    $checked = '';
+
+    // Only need to get checked state when in edit mode
+    if ($this->_view === 'edit') {
+      $Status = $this->_employee->status->edit->entries[0];
+      if ($Status->$name === '1') {
+        $checked = ' checked="checked"';
+      }
+    }
+
+    return $checked;
+  }
+
+  /**
    * Create (generic) HTML for delete modal (links and details added via JavaScript)
    *   (added to bottom of page per Foundation framework)
    *
@@ -54,6 +76,9 @@ class StatusView {
    * @return $html {String}
    */
   private function _getForm () {
+    $days = array(
+      'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
+    );
     $statuses = array(
       'administrative leave',
       'alternative work schedule',
@@ -74,6 +99,18 @@ class StatusView {
       $Status = new Status(array('id' => NULL));
     }
 
+    $dayCheckBoxes = '';
+    foreach ($days as $day) {
+      $dayCheckBoxes .= sprintf('<input name="%s" id="%s" type="checkbox" value="1"%s>
+        <label for="%s">%s</label>',
+        $day,
+        $day,
+        $this->_getCheckedSnippet($day),
+        $day,
+        ucwords($day)
+      );
+    }
+
     $indefiniteChecked = '';
     if ($Status->begin && !$Status->end) {
       $indefiniteChecked = ' checked="checked"';
@@ -87,30 +124,40 @@ class StatusView {
 
     $html = sprintf('<form action="/contact/staff/%s/status/" name="form1" id="form1"
       method="post" enctype="application/x-www-form-urlencoded">
-        <label for="status">Status</label>
+        <label for="status" class="fieldtitle">Status</label>
         <select id="status" name="status" required>
           <option value="">Choose&hellip;</option>
           %s
         </select>
-        <label for="begin">
-          Date range <em>Enter a date value: mm/dd/yyyy, today, next wednesday, mar 1, etc.</em>
-        </label>
-        <input type="text" name="begin" id="begin" size="12" value="%s" required />
-          &ndash;
-        <input type="text" name="end" id="end" size="12" value="%s" />
-        <span id="forever">
-          <input name="indefinite" id="indefinite" type="checkbox" value="true"%s />
-          <label for="indefinite">Indefinite</label>
-        </span>
+        <div id="select-type" class="checkbox">
+          <input name="recurring" id="recurring" type="checkbox" value="1"%s >
+          <label for="recurring">Recurring</label>
+        </div>
+        <div id="option-dates">
+          <label for="begin" class="fieldtitle">
+            Date range <em>Enter a date value: mm/dd/yyyy, today, next wednesday, mar 1, etc.</em>
+          </label>
+          <input type="text" name="begin" id="begin" size="12" value="%s" />
+            &ndash;
+          <input type="text" name="end" id="end" size="12" value="%s" />
+          <span id="forever" class="checkbox">
+            <input name="indefinite" id="indefinite" type="checkbox" value="1"%s />
+            <label for="indefinite">Indefinite</label>
+          </span>
+        </div>
+        <div id="option-days" class="checkbox">
+          <p class="fieldtitle">Repeat every:</p>
+          %s
+        </div>
         <div id="option-contact">
-          <label for="contact">Location & contact info <em>Include city, hotel, etc.</em></label>
+          <label for="contact" class="fieldtitle">Location & contact info <em>Include city, hotel, etc.</em></label>
           <textarea name="contact" id="contact" rows="2" cols="40">%s</textarea>
         </div>
-        <div id="option-backup">
+        <div id="option-backup" class="fieldtitle">
           <label for="backup">Backup person</label>
           <input name="backup" id="backup" type="text" value="%s" size="40" maxlength="64" />
         </div>
-        <label for="comments">Comments</label>
+        <label for="comments" class="fieldtitle">Comments</label>
         <textarea name="comments" id="comments" rows="3" cols="40">%s</textarea>
         <input name="action" id="action" type="hidden" value="%s" />
         <input name="id" id="id" type="hidden" value="%s" />
@@ -119,9 +166,11 @@ class StatusView {
       </form>',
       $this->_employee->shortname,
       $optionTags,
+      $this->_getCheckedSnippet('recurring'),
       $Status->formatDate($Status->begin),
       $Status->formatDate($Status->end),
       $indefiniteChecked,
+      $dayCheckBoxes,
       $Status->contact,
       $Status->backup,
       $Status->comments,
@@ -201,6 +250,14 @@ class StatusView {
         'type' => 'current'
       ));
       $html .= $Status->getHtml();
+    }
+
+    // Recurring
+    if (property_exists($statusEntries, 'recurring')) {
+      $html .= '<h2>Recurring</h2>';
+      foreach ($statusEntries->recurring->entries as $Entry) {
+        $html .= $Entry->getHtml('showButtons');
+      }
     }
 
     // Future
