@@ -12,6 +12,8 @@ class Db {
   private $_dbExt, $_dbInt, $_ip;
 
   public function __construct() {
+    date_default_timezone_set('America/Los_Angeles');
+
     // Internal db connector - status entries (sets $db)
     include_once $_SERVER['DOCUMENT_ROOT'] . '/template/db/dbConnect-escintWrite.inc.php';
     $this->_dbInt = $db;
