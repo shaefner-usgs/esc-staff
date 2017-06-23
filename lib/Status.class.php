@@ -14,8 +14,6 @@ class Status {
   private $_data = array();
 
   public function __construct ($params=NULL) {
-    $reqFields = array('backup', 'begin', 'comments', 'contact', 'end', 'status');
-
     // Params passed to constructor will override corresponding key-value pairs
     // from database when using PDO::FETCH_CLASS to instantiate
     if (is_array($params)) {
@@ -23,13 +21,8 @@ class Status {
         $this->_data[$key] = $value;
       }
     }
-    // Be certain all req'd fields exist (if not, create and set values to NULL)
-    foreach ($reqFields as $field) {
-      if (!array_key_exists($field, $this->_data)) {
-        // Must be set to NULL so that 'end' is NULL in db when not set
-        $this->_data[$field] = NULL;
-      }
-    }
+
+    $this->_setRequiredProps();
   }
 
   public function __get ($name) {
@@ -77,6 +70,23 @@ class Status {
     }
 
     return $keep;
+  }
+
+  /**
+   * Be certain all req'd props exist (if not, create and set value to NULL)
+   *   required properties correspond to form fields on add / edit forms
+   */
+  private function _setRequiredProps () {
+    $reqProps = array('backup', 'begin', 'comments', 'contact', 'end', 'status');
+
+    // Be certain all req'd fields exist (if not, create and set values to NULL)
+    foreach ($reqProps as $prop) {
+      if (!array_key_exists($prop, $this->_data)) {
+        // Must be set to NULL so that 'end' is NULL in db when not set
+        $this->_data[$prop] = NULL;
+      }
+    }
+
   }
 
   /**
