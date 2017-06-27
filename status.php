@@ -53,21 +53,21 @@ $statusEntries = array();
 
 if ($view === 'add') { // default view: show add form + list of status entries
   // Query database to get employee's status entries
-  $rsStatusEntriesCurrent = $Db->selectStatusEntries($shortname);
+  $rsStatusEntriesPresent = $Db->selectStatusEntries($shortname);
   $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
   $rsStatusEntriesPast = $Db->selectStatusEntries($shortname, 'past');
   $rsStatusEntriesRec = $Db->selectStatusEntries($shortname, 'recurring');
 
   // Create a Status instance for each entry
   $statusEntries = array(
-    'current' => $rsStatusEntriesCurrent->fetchall(PDO::FETCH_CLASS, 'Status',
-      array(array('type' => 'current'))
-    ),
     'future' => $rsStatusEntriesFuture->fetchall(PDO::FETCH_CLASS, 'Status',
       array(array('type' => 'future'))
     ),
     'past' => $rsStatusEntriesPast->fetchall(PDO::FETCH_CLASS, 'Status',
       array(array('type' => 'past'))
+    ),
+    'present' => $rsStatusEntriesPresent->fetchall(PDO::FETCH_CLASS, 'Status',
+      array(array('type' => 'present'))
     ),
     'recurring' => $rsStatusEntriesRec->fetchall(PDO::FETCH_CLASS, 'Status',
       array(array('type' => 'recurring'))

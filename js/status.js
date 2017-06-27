@@ -79,6 +79,8 @@
           $(elem).addClass('error');
           if (elem === '#begin') {
             selector = '#forever';
+          } else if (elem === '#option-days') {
+            selector = '#option-days label:last-child';
           } else {
             selector = elem;
           }

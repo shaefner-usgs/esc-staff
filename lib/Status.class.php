@@ -11,7 +11,7 @@
  */
 class Status {
   // Initialize outside constructor so it's available to populate immediately
-  private $_data = array();
+  private $_data = array(), $_days;
 
   public function __construct ($params=NULL) {
     // Params passed to constructor will override corresponding key-value pairs
@@ -21,6 +21,10 @@ class Status {
         $this->_data[$key] = $value;
       }
     }
+
+    $this->_days = array(
+      'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
+    );
 
     $this->_setRequiredProps();
   }
@@ -153,18 +157,14 @@ class Status {
    *
    * @param $showButtons {Boolean}
    *     Controls whether or not edit / delete buttons are created
-   * @param $active {Boolean}
-   *     Controls whether or not a checkmark is displayed to indicate active state
+   * @param $selected {Boolean}
+   *     Controls whether or not a checkmark is displayed to indicate selected state
    *
    * @return $html {String}
    */
-  public function getHtml ($showButtons=false, $active=false) {
-    $actionButtons = '';
-    $checkmark = '';
-    $cssClass = '';
-    $trs = '';
-
+  public function getHtml ($showButtons=false, $selected=false) {
     // Create 'Edit' and 'Delete' buttons
+    $actionButtons = '';
     if ($showButtons && strtolower($this->_data['status']) !== 'in the office') {
       $actionButtons = sprintf('<ul class="actions">
           <li>
@@ -181,15 +181,14 @@ class Status {
       );
     }
 
-    if ($active) {
+    $checkmark = '';
+    if ($selected) {
       $checkmark = '<i class="fa fa-check" aria-hidden="true"></i>';
     }
 
-    if ($this->_data['type'] === 'future') {
-      $cssClass = 'secondary future';
-    }
-    else if ($this->_data['type'] === 'past') {
-      $cssClass = 'secondary past';
+    $cssClass = $this->_data['type'];
+    if (!$this->isActive()) {
+      $cssClass .= ' secondary';
     }
 
     $html = sprintf('<div class="alert-box %s">%s %s <em>%s</em>%s</div>',
@@ -200,6 +199,7 @@ class Status {
       $actionButtons
     );
 
+    $trs = '';
     if ($this->_data['contact'] && $this->_data['status'] !== 'annual leave') {
       $trs .= sprintf('<tr><th>Contact info</th><td>%s</td></tr>',
         $this->_data['contact']
@@ -237,11 +237,7 @@ class Status {
 
     // For recurring entries, get the list of days that apply
     if ($this->_data['recurring'] === '1') {
-      $days = array(
-        'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
-      );
-
-      foreach ($days as $day) {
+      foreach ($this->_days as $day) {
         if ($this->_data[$day] === '1') {
           $recDays[] = ucwords($day) . 's';
         }
@@ -298,5 +294,36 @@ class Status {
     }
 
     return $timespan;
+  }
+
+  /**
+   * Determine if a status entry is 'active' today
+   *  - if (non-recurring) entry's date range includes today
+   *  - if recurring entry occurs on this day of the week
+   *
+   * @return $r {Boolean}
+   */
+  public function isActive () {
+    $r = false;
+    $timestamp = time();
+    $today = strtolower(date('l'));
+
+    if ($this->_data['type'] === 'recurring') { // recurring entry
+      foreach ($this->_days as $day) {
+        if ($day === $today && $this->_data[$day] === '1') {
+          $r = true;
+        }
+      }
+    } else { // non-recurring entry
+      $begun = $timestamp >= strtotime($this->_data['begin'] . ' 00:00:00');
+      $finished = $timestamp > strtotime($this->_data['end'] . ' 23:59:59')
+        && $this->_data['end'] !== NULL;
+
+      if ($begun && !$finished) {
+        $r = true;
+      }
+    }
+
+    return $r;
   }
 }

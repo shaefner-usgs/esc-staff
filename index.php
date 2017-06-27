@@ -21,7 +21,7 @@ $sortBy = safeParam('sortby', 'name');
 // Query database to get all employees / associated 'current' status entries
 $Db = new Db;
 $rsEmployees = $Db->selectEmployees();
-$rsStatusEntriesCurrent = $Db->selectStatusEntries();
+$rsStatusEntriesPresent = $Db->selectStatusEntries();
 $rsStatusEntriesRec = $Db->selectStatusEntries(NULL, 'recurring');
 
 // Create an Employee instance for each employee
@@ -29,20 +29,23 @@ $employees = $rsEmployees->fetchAll(PDO::FETCH_CLASS, 'Employee');
 
 // Index status entries by employee shortname (1st column in query)
 $statusEntries = array(
-  'current' => $rsStatusEntriesCurrent->fetchAll(PDO::FETCH_GROUP),
+  'present' => $rsStatusEntriesPresent->fetchAll(PDO::FETCH_GROUP),
   'recurring' => $rsStatusEntriesRec->fetchAll(PDO::FETCH_GROUP)
 );
 
 // Create a Collection of Employees (including thier 'current' status entries)
 $EmployeeCollection = new EmployeeCollection;
 foreach ($employees as $Employee) {
+
+  // Group status entries into Collections by type
   $StatusCollection = new stdClass(); // initialize empty object
-  // Create a Collection of 'current' Status instances for Employee
-  if (array_key_exists($Employee->shortname, $statusEntries['current'])) {
-    $StatusCollection->current = new StatusCollection;
-    foreach ($statusEntries['current'][$Employee->shortname] as $entry) {
-      $Status = new Status($entry);
-      $StatusCollection->current->add($Status);
+  foreach ($statusEntries as $type => $entries) {
+    if (count($entries) > 0) {
+      $StatusCollection->$type = new StatusCollection;
+
+      foreach ($entries as $Entry) {
+        $StatusCollection->$type->add($Entry);
+      }
     }
   }
   $Employee->status = $StatusCollection;

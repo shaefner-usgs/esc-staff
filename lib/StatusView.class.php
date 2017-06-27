@@ -223,42 +223,51 @@ class StatusView {
   }
 
   /**
-   * Create HTML for status entries
+   * Create HTML for list of status entries
    *
    * @return $html {String}
    */
   private function _getStatusEntries () {
     $statusEntries = $this->_employee->status;
 
-    $html = '<h2>Currently</h2>';
-
-    // Current
-    if (property_exists($statusEntries, 'current')) {
-      $StatusNow = $this->_employee->getStatusNow();
-      foreach ($statusEntries->current->entries as $Entry) {
-        if (count($statusEntries->current->entries) > 1 && $Entry === $StatusNow) {
-          // Indicate 'active' status to user
-          $html .= $Entry->getHtml('showButtons', 'active');
-        } else {
-          $html .= $Entry->getHtml('showButtons');
-        }
-      }
-    } else { // create default status if no current status is set
-      $Status = new Status(array(
-        'status' => 'in the office',
-        'timespan' => '(Default setting)',
-        'type' => 'current'
-      ));
-      $html .= $Status->getHtml();
+    // Combine present and recurring entries
+    if (!property_exists($statusEntries, 'present')) {
+      $statusEntries->present = new stdClass();
+      $statusEntries->present->entries = array();
     }
+    if (!property_exists($statusEntries, 'recurring')) {
+      $statusEntries->recurring = new stdClass();
+      $statusEntries->recurring->entries = array();
+    }
+    $currentEntries = array_merge(
+      $statusEntries->present->entries,
+      $statusEntries->recurring->entries
+    );
 
-    // Recurring
-    if (property_exists($statusEntries, 'recurring')) {
-      $html .= '<h2>Recurring</h2>';
-      foreach ($statusEntries->recurring->entries as $Entry) {
+    // Current (present and recurring)
+    $activeEntry = false;
+    $StatusNow = $this->_employee->getStatusNow('(Default setting)');
+    $html = '';
+    foreach ($currentEntries as $Entry) {
+      if ($Entry->isActive()) {
+        $activeEntry = true;
+      }
+      if (count($currentEntries) > 1 && $Entry === $StatusNow) {
+        // Indicate 'selected' status to user
+        $html .= $Entry->getHtml('showButtons', 'selected');
+      } else {
         $html .= $Entry->getHtml('showButtons');
       }
     }
+    if (!$activeEntry) { // create default status if no current status is set
+      $Status = new Status(array(
+        'status' => 'in the office',
+        'timespan' => '(Default setting)',
+        'type' => 'present'
+      ));
+      $html = $Status->getHtml() . $html;
+    }
+    $html = '<h2>Currently</h2>' . $html;
 
     // Future
     if (property_exists($statusEntries, 'future')) {

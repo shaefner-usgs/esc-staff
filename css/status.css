@@ -25,6 +25,11 @@ h1 em {
   font-weight: bold;
 }
 
+/* don't color checkbox list of days red if error triggered */
+#option-days.error label {
+  color: #4d4d4d;
+}
+
 #select-type {
   margin-top: 1em;
 }
@@ -50,6 +55,6 @@ h1 em {
 }
 
 p.error {
-  color: #c60f13;
+  color: #ea2e49;
   margin: 0;
 }

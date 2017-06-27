@@ -209,13 +209,14 @@ class Db {
    *
    * @param $shortname {String}
    *     Optional email shortname (text before '@') of employee to query
-   * @param $filter {String <past | current | future | recurring>}
-   *     Optional - default is 'current' (past / future, etc. not included)
+   * @param $filter {String <past | present | future | recurring>}
+   *     Optional - default is 'present'
    *
    * @return {Function}
    */
-  public function selectStatusEntries ($shortname=NULL, $filter='current') {
+  public function selectStatusEntries ($shortname=NULL, $filter='present') {
     $orderbyClause = 'ORDER BY `shortname` ASC';
+    $params = array();
     $whereClause = 'WHERE `deleted` = 0'; // not deleted by user
 
     // Get status entries for a specific employee
@@ -241,7 +242,7 @@ class Db {
       if ($filter === 'past') {
         $whereClause .= ' AND `end` < :today';
       }
-      else if ($filter === 'current') {
+      else if ($filter === 'present') {
         $whereClause .= ' AND `begin` <= :today AND (`end` >= :today OR `end` IS NULL)';
       }
       else if ($filter === 'future') {

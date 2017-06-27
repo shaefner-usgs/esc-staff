@@ -71,26 +71,41 @@ class Employee {
   }
 
   /**
-   * Get employee's status right now
+   * Get employee's status right now - return default status if none set
    *
-   * return $Status {Object: Status instance}
+   * @param $timespan {String}
+   *     timespan (description) for default status (likely either 'today' or '(Default setting)')
+   *
+   * @return $Status {Object: Status instance}
    */
-  public function getStatusNow () {
+  public function getStatusNow ($timespan = 'today') {
     $defaultStatus = 'in the office';
     $statusEntries = $this->_data['status'];
 
     // Create default Status instance
-    $Status = new Status(array('status' => $defaultStatus));
+    $Status = new Status(array(
+      'status' => $defaultStatus,
+      'timespan' => $timespan,
+      'type' => 'default'
+    ));
 
-    // Check if employee has any 'current' status entries set
-    if (property_exists($statusEntries, 'current')) {
-
-      // Prioritize 1) entries with explicit ending dates; 2) 'newer' entries
+    // Check if employee has any 'present' status entries set
+    if (property_exists($statusEntries, 'present')) {
+      // Prioritize:
+      //  1) non-recurring entries;
+      //  2) entries with explicit ending dates;
+      //  3) 'newer' entries
       //   (array is sorted by begin date, so 'newer' entries will prevail)
-      foreach ($statusEntries->current->entries as $Entry) {
-
+      foreach ($statusEntries->present->entries as $Entry) {
         // Only set status to 'indefinite' entry if it's overriding default value
         if ($Entry->end || $Status->status === $defaultStatus) {
+          $Status = $Entry;
+        }
+      }
+    }
+    else if (property_exists($statusEntries, 'recurring')) {
+      foreach ($statusEntries->recurring->entries as $Entry) {
+        if ($Status->isActive()) {
           $Status = $Entry;
         }
       }
