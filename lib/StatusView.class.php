@@ -191,6 +191,7 @@ class StatusView {
   private function _getMaintenanceMsg () {
     $timestamp = filemtime('lib/StatusView.class.php');
     $datetime = date('D, M j h:i A', $timestamp);
+
     $html = '<div class="alert-box alert">
         Currently under maintenance <em>' . $datetime. '</em>
       </div>
@@ -251,7 +252,7 @@ class StatusView {
         }
       }
     }
-    // Display (default) current status if none set
+    // Display (default) status if no 'active' status is set
     if (!$activeStatus) {
       $html = $StatusNow->getHtml() . $html;
     }
