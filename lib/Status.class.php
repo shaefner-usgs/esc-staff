@@ -25,12 +25,12 @@ class Status {
     $this->_days = array(
       'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
     );
-
-    $this->_setRequiredProps();
   }
 
   public function __get ($name) {
-    return $this->_data[$name];
+    if (isset($this->_data[$name])) {
+      return $this->_data[$name];
+    }
   }
 
   public function __set ($name, $value) {
@@ -79,30 +79,6 @@ class Status {
     }
 
     return $keep;
-  }
-
-  /**
-   * Be certain all req'd props exist (if not, create and set value to NULL or 0)
-   *   required properties correspond to form fields on add / edit forms
-   */
-  private function _setRequiredProps () {
-    $reqProps = array('backup', 'begin', 'comments', 'contact', 'end',
-      'friday', 'monday', 'recurring', 'status', 'thursday', 'tuesday',
-      'wednesday'
-    );
-    $setToZero = array('friday', 'monday', 'recurring', 'thursday', 'tuesday',
-      'wednesday'
-    );
-
-    foreach ($reqProps as $prop) {
-      if (!array_key_exists($prop, $this->_data)) {
-        if (in_array($prop, $setToZero)) {
-          $this->_data[$prop] = 0;
-        } else {
-          $this->_data[$prop] = NULL;
-        }
-      }
-    }
   }
 
   /**
@@ -200,17 +176,19 @@ class Status {
     );
 
     $trs = '';
-    if ($this->_data['contact'] && $this->_data['status'] !== 'annual leave') {
+    if (isset($this->_data['contact']) && $this->_data['contact']
+      && $this->_data['status'] !== 'annual leave') {
       $trs .= sprintf('<tr><th>Contact info</th><td>%s</td></tr>',
         $this->_data['contact']
        );
     }
-    if ($this->_data['backup'] && $this->_data['status'] !== 'working at home') {
+    if (isset($this->_data['backup']) && $this->_data['backup']
+      && $this->_data['status'] !== 'working at home') {
       $trs .= sprintf('<tr><th>Backup person</th><td>%s</td></tr>',
         $this->_data['backup']
       );
     }
-    if ($this->_data['comments']) {
+    if (isset($this->_data['comments']) && $this->_data['comments']) {
       $trs .= sprintf('<tr><th>Comments</th><td>%s</td></tr>',
         $this->_data['comments']
        );
@@ -236,7 +214,7 @@ class Status {
     }
 
     // For recurring entries, get the list of days that apply
-    if ($this->_data['recurring'] === '1') {
+    if (isset($this->_data['recurring']) && $this->_data['recurring'] === '1') {
       foreach ($this->_days as $day) {
         if ($this->_data[$day] === '1') {
           $recDays[] = ucwords($day) . 's';
@@ -248,7 +226,7 @@ class Status {
     }
 
     // Calculate timespan if entry has at least a begin date
-    if ($this->_data['begin']) {
+    if (isset($this->_data['begin']) && $this->_data['begin']) {
       $begin = $this->_data['begin'];
       $end = $this->_data['end'];
 

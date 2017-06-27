@@ -100,14 +100,20 @@ class StatusView {
     }
 
     $dayCheckBoxes = '';
+    $hiddenCheckBoxes = '<input type="hidden" name="recurring" value="0" />';
     foreach ($days as $day) {
-      $dayCheckBoxes .= sprintf('<input name="%s" id="%s" type="checkbox" value="1"%s>
+      $dayCheckBoxes .= sprintf('<input name="%s" id="%s" type="checkbox" value="1"%s />
         <label for="%s">%s</label>',
         $day,
         $day,
         $this->_getCheckedSnippet($day),
         $day,
         ucwords($day)
+      );
+      // Set hidden inputs w/ same name (values set to '0') to include unchecked boxes in $_POST 
+      //   ('real' inputs will override since they are listed later in the markup)
+      $hiddenCheckBoxes .= sprintf('<input type="hidden" name="%s" value="0" />',
+        $day
       );
     }
 
@@ -124,13 +130,14 @@ class StatusView {
 
     $html = sprintf('<form action="/contact/staff/%s/status/" name="form1" id="form1"
       method="post" enctype="application/x-www-form-urlencoded">
+        %s
         <label for="status" class="fieldtitle">Status</label>
         <select id="status" name="status" required>
           <option value="">Choose&hellip;</option>
           %s
         </select>
         <div id="select-type" class="checkbox">
-          <input name="recurring" id="recurring" type="checkbox" value="1"%s >
+          <input name="recurring" id="recurring" type="checkbox" value="1"%s />
           <label for="recurring">Recurring</label>
         </div>
         <div id="option-dates">
@@ -165,6 +172,7 @@ class StatusView {
         <button name="submit" id="submit" type="submit" class="radius button success">Set Status</button>
       </form>',
       $this->_employee->shortname,
+      $hiddenCheckBoxes,
       $optionTags,
       $this->_getCheckedSnippet('recurring'),
       $Status->formatDate($Status->begin),
