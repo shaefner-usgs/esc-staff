@@ -119,10 +119,8 @@ class EmployeeView {
     );
     $StatusNow = $this->_employee->getStatusNow($defaultStatus);
 
-    $html = '';
-
     // Now
-    $html .= $StatusNow->getHtml();
+    $html = $StatusNow->getHtml();
 
     // Future
     if (property_exists($statusEntries, 'future')) {
