@@ -73,6 +73,11 @@ if ($view === 'add') { // default view: show add form + list of status entries
       array(array('type' => 'recurring'))
     )
   );
+  // Combine all 'current' (present and recurring) entries in 1 place
+  $statusEntries['current'] = array_merge(
+    $statusEntries['present'],
+    $statusEntries['recurring']
+  );
 }
 else if ($view === 'edit') { // edit entry view: show edit form containing entry
   // Create a Status instance for entry user is editing

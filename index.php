@@ -27,7 +27,7 @@ $rsStatusEntriesRec = $Db->selectStatusEntries(NULL, 'recurring');
 // Create an Employee instance for each employee
 $employees = $rsEmployees->fetchAll(PDO::FETCH_CLASS, 'Employee');
 
-// Index status entries by employee shortname (1st column in query)
+// Index 'current' status entries by employee shortname (1st column in query)
 $statusEntries = array(
   'present' => $rsStatusEntriesPresent->fetchAll(PDO::FETCH_GROUP),
   'recurring' => $rsStatusEntriesRec->fetchAll(PDO::FETCH_GROUP)
@@ -39,12 +39,14 @@ foreach ($employees as $Employee) {
 
   // Group status entries into Collections by type
   $StatusCollection = new stdClass(); // initialize empty object
-  foreach ($statusEntries as $type => $entries) {
-    if (count($entries) > 0) {
+  foreach ($statusEntries as $type => $array) {
+    if (is_array($statusEntries[$type])
+      && array_key_exists($Employee->shortname, $statusEntries[$type])) {
       $StatusCollection->$type = new StatusCollection;
-
-      foreach ($entries as $Entry) {
-        $StatusCollection->$type->add($Entry);
+      foreach ($statusEntries[$type][$Employee->shortname] as $entry) {
+        $entry['type'] = $type;
+        $Status = new Status($entry);
+        $StatusCollection->$type->add($Status);
       }
     }
   }

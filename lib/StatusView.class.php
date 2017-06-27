@@ -230,42 +230,30 @@ class StatusView {
   private function _getStatusEntries () {
     $statusEntries = $this->_employee->status;
 
-    // Combine present and recurring entries
-    if (!property_exists($statusEntries, 'present')) {
-      $statusEntries->present = new stdClass();
-      $statusEntries->present->entries = array();
-    }
-    if (!property_exists($statusEntries, 'recurring')) {
-      $statusEntries->recurring = new stdClass();
-      $statusEntries->recurring->entries = array();
-    }
-    $currentEntries = array_merge(
-      $statusEntries->present->entries,
-      $statusEntries->recurring->entries
+    // Get employee's status now (or use default status if none set)
+    $defaultStatus = array(
+      'status' => 'in the office',
+      'timespan' => '(Default setting)'
     );
+    $StatusNow = $this->_employee->getStatusNow($defaultStatus);
+
+    $html = '';
 
     // Current (present and recurring)
-    $activeEntry = false;
-    $StatusNow = $this->_employee->getStatusNow('(Default setting)');
-    $html = '';
-    foreach ($currentEntries as $Entry) {
-      if ($Entry->isActive()) {
-        $activeEntry = true;
-      }
-      if (count($currentEntries) > 1 && $Entry === $StatusNow) {
-        // Indicate 'selected' status to user
-        $html .= $Entry->getHtml('showButtons', 'selected');
-      } else {
-        $html .= $Entry->getHtml('showButtons');
+    $activeStatus = false;
+    if (property_exists($statusEntries, 'current')) {
+      foreach ($statusEntries->current->entries as $Entry) {
+        if ($Entry === $StatusNow) { // Indicate 'selected' status (checkmark)
+          $html .= $Entry->getHtml('showButtons', 'selected');
+          $activeStatus = true;
+        } else {
+          $html .= $Entry->getHtml('showButtons');
+        }
       }
     }
-    if (!$activeEntry) { // create default status if no current status is set
-      $Status = new Status(array(
-        'status' => 'in the office',
-        'timespan' => '(Default setting)',
-        'type' => 'present'
-      ));
-      $html = $Status->getHtml() . $html;
+    // Display (default) current status if none set
+    if (!$activeStatus) {
+      $html = $StatusNow->getHtml() . $html;
     }
     $html = '<h2>Currently</h2>' . $html;
 

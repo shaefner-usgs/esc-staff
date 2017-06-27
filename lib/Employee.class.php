@@ -71,41 +71,48 @@ class Employee {
   }
 
   /**
-   * Get employee's status right now - return default status if none set
+   * Get employee's status right now (or return default status if none set)
    *
-   * @param $timespan {String}
-   *     timespan (description) for default status (likely either 'today' or '(Default setting)')
+   * Returns a single, 'winning' status entry by prioritizing, in this order:
+   *  1) non-recurring entries;
+   *  2) entries with explicit ending dates;
+   *  3) 'newer' entries (based on begin date)
+   *  4) entries changed by user more recently
+   *
+   * arrays are sorted by begin date / changed date, so 'newer' entries will
+   * prevail as they are looped over and overwritten
+
+   * @param $options {Array}
+   *     Optional: key-value pairs for default status if none set by user
    *
    * @return $Status {Object: Status instance}
    */
-  public function getStatusNow ($timespan = 'today') {
-    $defaultStatus = 'in the office';
+  public function getStatusNow ($options=array()) {
     $statusEntries = $this->_data['status'];
 
-    // Create default Status instance
-    $Status = new Status(array(
-      'status' => $defaultStatus,
-      'timespan' => $timespan,
+    // Create a default Status instance
+    $defaultOptions = array(
+      'status' => 'in the office',
+      'timespan' => 'today',
       'type' => 'default'
-    ));
+    );
+    $options = array_merge($defaultOptions, $options);
 
-    // Check if employee has any 'present' status entries set
+    $Status = new Status($options);
+
+    // 1st, check if employee has any 'present' status entries set
     if (property_exists($statusEntries, 'present')) {
-      // Prioritize:
-      //  1) non-recurring entries;
-      //  2) entries with explicit ending dates;
-      //  3) 'newer' entries
-      //   (array is sorted by begin date, so 'newer' entries will prevail)
       foreach ($statusEntries->present->entries as $Entry) {
         // Only set status to 'indefinite' entry if it's overriding default value
-        if ($Entry->end || $Status->status === $defaultStatus) {
+        if ($Entry->end || $Status->status === $options['status']) {
           $Status = $Entry;
         }
       }
     }
+    // If no 'present' status entries, check for recurring
     else if (property_exists($statusEntries, 'recurring')) {
       foreach ($statusEntries->recurring->entries as $Entry) {
-        if ($Status->isActive()) {
+        if ($Entry->isActive()) {
           $Status = $Entry;
         }
       }

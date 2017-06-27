@@ -144,7 +144,7 @@ class Status {
    *
    * @param $date {String}
    *
-   * @return $formatted {String}
+   * @return {String}
    */
   public function formatDate ($date) {
     if ($date) {
@@ -187,7 +187,7 @@ class Status {
     }
 
     $cssClass = $this->_data['type'];
-    if (!$this->isActive()) {
+    if (!$this->isActive() && $this->_data['type'] !== 'default') {
       $cssClass .= ' secondary';
     }
 
@@ -298,28 +298,30 @@ class Status {
 
   /**
    * Determine if a status entry is 'active' today
-   *  - if (non-recurring) entry's date range includes today
-   *  - if recurring entry occurs on this day of the week
    *
    * @return $r {Boolean}
    */
   public function isActive () {
     $r = false;
-    $timestamp = time();
-    $today = strtolower(date('l'));
 
-    if ($this->_data['type'] === 'recurring') { // recurring entry
+    // Recurring entry (active if it occurs on this day of the week)
+    if ($this->_data['type'] === 'recurring') {
+      $today = strtolower(date('l'));
+
       foreach ($this->_days as $day) {
         if ($day === $today && $this->_data[$day] === '1') {
           $r = true;
         }
       }
-    } else { // non-recurring entry
-      $begun = $timestamp >= strtotime($this->_data['begin'] . ' 00:00:00');
+    }
+    // Non-recurring entry (active if date range includes today)
+    else if ($this->_data['type'] === 'present') {
+      $timestamp = time();
+      $began = $timestamp >= strtotime($this->_data['begin'] . ' 00:00:00');
       $finished = $timestamp > strtotime($this->_data['end'] . ' 23:59:59')
         && $this->_data['end'] !== NULL;
 
-      if ($begun && !$finished) {
+      if ($began && !$finished) {
         $r = true;
       }
     }

@@ -105,27 +105,24 @@ class EmployeeView {
   }
 
   /**
-   * Create HTML for status entries
+   * Create HTML for list of status entries
    *
    * @return $html {String}
    */
   private function _getStatusEntries () {
     $statusEntries = $this->_employee->status;
 
+    // Get employee's status now (or use default status if none set)
+    $defaultStatus = array(
+      'status' => 'in the office',
+      'timespan' => 'Today'
+    );
+    $StatusNow = $this->_employee->getStatusNow($defaultStatus);
+
     $html = '';
 
-    // Current
-    if (property_exists($statusEntries, 'current')) {
-      $html .= $this->_employee->getStatusNow()->getHtml();
-    } else {
-      // Create default status if no current status is set
-      $Status = new Status(array(
-        'status' => 'in the office',
-        'timespan' => 'Today',
-        'type' => 'current'
-      ));
-      $html .= $Status->getHtml();
-    }
+    // Now
+    $html .= $StatusNow->getHtml();
 
     // Future
     if (property_exists($statusEntries, 'future')) {
