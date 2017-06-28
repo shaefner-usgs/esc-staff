@@ -255,7 +255,7 @@ class StatusView {
     if (property_exists($statusEntries, 'current')) {
       foreach ($statusEntries->current->entries as $Entry) {
         if ($Entry === $StatusNow) { // Indicate 'selected' status (checkmark)
-          $html .= $Entry->getHtml('showButtons', 'selected');
+          $html = $Entry->getHtml('showButtons', 'selected') . $html;
           $activeStatus = true;
         } else {
           $html .= $Entry->getHtml('showButtons');
