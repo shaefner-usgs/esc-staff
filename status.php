@@ -49,6 +49,11 @@ if (!isset($TEMPLATE)) {
   include_once ($_SERVER['DOCUMENT_ROOT'] . "/template/core/template.inc.php");
 }
 
+if (!$Employee) {
+  print "<h1>Employee ($shortname) Does Not Exist</h1>";
+  return;
+}
+
 $statusEntries = array();
 
 if ($view === 'add') { // default view: show add form + list of status entries

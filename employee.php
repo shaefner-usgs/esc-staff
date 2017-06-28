@@ -25,6 +25,11 @@ if (!isset($TEMPLATE)) {
   include_once ($_SERVER['DOCUMENT_ROOT'] . "/template/core/template.inc.php");
 }
 
+if (!$Employee) {
+  print "<h1>Employee ($shortname) Does Not Exist</h1>";
+  return;
+}
+
 // Query database to get employee's status entries
 $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
 $rsStatusEntriesPresent = $Db->selectStatusEntries($shortname);
