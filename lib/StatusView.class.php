@@ -99,8 +99,12 @@ class StatusView {
       $Status = new Status(array('id' => NULL));
     }
 
+    // Build html for list of checkboxes and corresponding hidden fields
+    // Set hidden inputs w/ same name (values set to '0') to include unchecked boxes in $_POST
+    //   ('real' inputs will override since they are listed later in the markup)
     $dayCheckBoxes = '';
-    $hiddenCheckBoxes = '<input type="hidden" name="recurring" value="0" />';
+    $hiddenCheckBoxes = '<input type="hidden" name="indefinite" value="0" />';
+    $hiddenCheckBoxes .= '<input type="hidden" name="recurring" value="0" />';
     foreach ($days as $day) {
       $dayCheckBoxes .= sprintf('<input name="%s" id="%s" type="checkbox" value="1"%s />
         <label for="%s">%s</label>',
@@ -110,8 +114,6 @@ class StatusView {
         $day,
         ucwords($day)
       );
-      // Set hidden inputs w/ same name (values set to '0') to include unchecked boxes in $_POST
-      //   ('real' inputs will override since they are listed later in the markup)
       $hiddenCheckBoxes .= sprintf('<input type="hidden" name="%s" value="0" />',
         $day
       );
