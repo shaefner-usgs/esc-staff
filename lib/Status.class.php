@@ -175,7 +175,7 @@ class Status {
       $cssClass .= ' secondary';
     }
 
-    $html = sprintf('<div class="alert-box %s">%s %s <em>%s</em>%s</div>',
+    $html = sprintf('<div class="alert-box %s"><p>%s %s <em>%s</em></p>%s</div>',
       $cssClass,
       ucfirst($this->_data['status']),
       $checkmark,
