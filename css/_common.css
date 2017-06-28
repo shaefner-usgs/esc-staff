@@ -42,6 +42,7 @@ th {
   margin-left: 1em;
 }
 .alert-box p {
+  font-weight: bold;
   line-height: 1;
   margin: 0;
 }
