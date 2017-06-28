@@ -18,11 +18,15 @@ h1 em {
   display: inline;
 }
 
-#deleteModal ul {
-  position: static;
-}
 #deleteModal p {
   font-weight: bold;
+}
+/* don't show checkmark in delete modal confirmation */
+#deleteModal i {
+  display: none;
+}
+#deleteModal ul {
+  position: static;
 }
 
 /* don't color checkbox list of days red if error triggered */
