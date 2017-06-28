@@ -1,50 +1,69 @@
-(function() {
+'use strict';
 
-  $(document).ready(function() {
-    initConfirm();
-    initForm();
-  });
+/**
+ * Class: Status
+ */
+var Status = function () {
 
-  var initConfirm = function() {
+  var _this,
+      _initialize,
 
-    // attach modal confirm window to delete buttons, set html
-    $('.delete').on('click', function(e) {
-      var box_text = $(this).parents('.alert-box').html(),
-        status_msg = box_text.split('<ul class="actions">'),
-        del_href = $(this).attr('href');
-      e.preventDefault();
-      $('#deleteModal p').html(status_msg[0]);
-      $('#delete').attr('href', del_href);
-      $('#deleteModal').reveal({animationSpeed: 150});
-    });
+      _errors,
 
-    // close modal
-    $('#cancel').on('click', function(e) {
-      $('#deleteModal').trigger('reveal:close');
-    });
+      _addEvents,
+      _hideModal,
+      _initDatePicker,
+      _showError,
+      _showModal,
+      _submitForm,
+      _swapDateFields,
+      _swapFields,
+      _toggleEndDate;
+
+
+  _initialize = function () {
+    _addEvents();
+    _initDatePicker();
+
+    // Initialize form based on status entry settings (in edit mode; no effect in add mode)
+    _swapDateFields();
+    _swapFields();
+    _toggleEndDate();
   };
 
-  var initForm = function() {
+  /**
+   * Set up event handlers
+   */
+  _addEvents = function () {
+    // Disable ending date field when user checks indefinite checkbox
+    $('#indefinite').on('change', _toggleEndDate);
 
-    // show / hide fields based on status selection
-    swapFields();
-    $('#status').on('change', swapFields);
+    // Show/hide form elements based on user's selections
+    $('#recurring').on('change', _swapDateFields);
+    $('#status').on('change', _swapFields);
 
-    // show / hide date / days based on recurring selection
-    swapType();
-    $('#recurring').on('change', swapType)
+    // Show/hide delete modal
+    $('.delete').on('click', _showModal);
+    $('#cancel').on('click', _hideModal);
 
-    // disable 'to' field when indefinite is checked
-    if ($('#indefinite').is(':checked')) {
-      disableToField();
-    }
-    $('#indefinite').on('change', disableToField);
+    // Check for required fields, then submit form
+    $('#submit').on('click', _submitForm);
+  }
 
-    // set up date picker
+  /**
+   * Hide delete modal (confirmation dialog)
+   */
+  _hideModal = function() {
+    $('#deleteModal').trigger('reveal:close');
+  }
+
+  /**
+   * Set up jQuery date picker
+   */
+  _initDatePicker = function () {
     $.datepicker.setDefaults({
       showAnim: false,
       constrainInput: false,
-      //dateFormat: 'D, M d, yy',
       hideIfNoPrevNext: true,
       maxDate: '+2y',
       minDate: '0',
@@ -52,99 +71,158 @@
       showAnim: 'fadeIn',
       stepMonths: 1
     });
+
     $('#begin').datepicker({
       onSelect: function(selDate) {
         $('#end').datepicker('option', 'minDate', selDate);
-        if (!$('#end').val() && !$('#indefinite').is(':checked')) { // set 'to' date to default to 'from' if empty
+        // Set 'end' date to default to 'begin' if empty
+        if (!$('#end').val() && !$('#indefinite').is(':checked')) {
           $('#end').datepicker('setDate', selDate);
         }
       }
     });
+
     $('#end').datepicker({
       onSelect: function(selDate) {
         $('#begin').datepicker('option', 'maxDate', selDate);
-        if (!$('#begin').val()) { // set 'from' date to default to 'to' if empty
+        // Set 'begin' date to default to 'end' if empty
+        if (!$('#begin').val()) {
           $('#begin').datepicker('setDate', selDate);
         }
       }
     });
-
-    // require status, date / day fields
-    $('#submit').on('click', function(e) {
-      $('input, select').removeClass('error');
-      $('p.error').remove();
-      var selector,
-        show_error = function(elem, msg) {
-          e.preventDefault();
-          $(elem).addClass('error');
-          if (elem === '#begin') {
-            selector = '#forever';
-          } else if (elem === '#option-days') {
-            selector = '#option-days label:last-child';
-          } else {
-            selector = elem;
-          }
-          $(selector).after('<p class="error">' + msg + '</p>');
-        };
-
-      if (!$('#end').val() && !$('#indefinite').is(':checked')) {
-        //show_error('#end', 'Please enter an end date');
-      }
-      if (!$('#begin').val() && !$('#recurring').is(':checked')) {
-        show_error('#begin', 'Enter a beginning date');
-      }
-      if ($('#recurring').is(':checked')) {
-        var checked = false;
-        var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-        days.forEach(function (day) {
-          if ($('#' + day).is(':checked')) {
-            checked = true;
-          }
-        });
-        if (!checked) {
-          show_error('#option-days', 'Select at least 1 day');
-        }
-      }
-      if (!$('#status option:selected').val()) {
-        show_error('#status', 'Select a status');
-      }
-    });
-  };
-
-  // disable 'to' field if indefinite selected
-  var disableToField = function () {
-    $("#end").attr('disabled', $('#indefinite').is(':checked'));
-    $("#end").datepicker('setDate', null);
-    $("#begin").datepicker('option', 'maxDate', '+2y');
   }
 
-  // show/hide fields based on status selected
-  var swapFields = function() {
-    var sel = $('#status option:selected').val();
+  /**
+   * Display validation errors inline
+   *
+   * @param el {Element}
+   * @param msg {String}
+   */
+  _showError = function (el, msg) {
+    var selector;
 
-    // first reset to defaults
-    $('#option-contact').css('display', 'block');
-    $('#contact').removeAttr('disabled');
-    $('#option-backup').css('display', 'block');
-    $('#backup').removeAttr('disabled');
+    // Flag to stop form submission
+    _errors = true;
 
-    if (sel === 'annual leave') {
-      $('#option-contact').css('display', 'none');
-      $('#contact').attr('disabled', 'disabled');
-    } else if (sel === 'working at home') {
-      $('#option-backup').css('display', 'none');
-      $('#backup').attr('disabled', 'disabled');
+    if (el === '#begin') {
+      selector = '#forever';
+    } else if (el === '#option-days') {
+      selector = '#option-days label:last-child';
+    } else {
+      selector = el;
     }
-  };
 
-  var swapType = function () {
+    $(selector).after('<p class="error">' + msg + '</p>');
+    $(el).addClass('error');
+  }
+
+  /**
+   * Show delete modal (confirmation dialog) and populate w/ status entry details
+   *
+   * @param e {Event}
+   */
+  _showModal = function (e) {
+    var msg = $(this).parents('.alert-box').find('p').html();
+
+    $('#deleteModal p').html(msg);
+    $('#delete').attr('href', $(this).attr('href'));
+    $('#deleteModal').reveal({animationSpeed: 150});
+
+    e.preventDefault();
+  }
+
+  /**
+   * Validate and then submit form
+   *
+   * @param e {Event}
+   */
+  _submitForm = function (e) {
+    var checked,
+        days;
+
+    // First, reset any previous errors
+    _errors = false;
+    $('input, select').removeClass('error');
+    $('p.error').remove();
+
+    // Begin date
+    if (!$('#begin').val() && !$('#recurring').is(':checked')) {
+      _showError('#begin', 'Enter a beginning date');
+    }
+
+    // Recurring
+    if ($('#recurring').is(':checked')) {
+      checked = false;
+
+      days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+      days.forEach(function (day) {
+        if ($('#' + day).is(':checked')) {
+          checked = true;
+        }
+      });
+
+      if (!checked) {
+        _showError('#option-days', 'Select at least 1 day');
+      }
+    }
+
+    // Status
+    if (!$('#status option:selected').val()) {
+      _showError('#status', 'Select a status');
+    }
+
+    if (_errors) {
+      e.preventDefault();
+    }
+  }
+
+  /**
+   * Show/hide dates/days form elements based on 'recurring' selection
+   */
+  _swapDateFields = function () {
     if ($('#recurring').is(':checked')) {
       $('#option-dates').css('display', 'none');
       $('#option-days').css('display', 'block');
-    } else {
+    }
+    else {
       $('#option-dates').css('display', 'block');
       $('#option-days').css('display', 'none');
     }
   }
 
-})();
+  /**
+   * Show/hide fields based on 'status' selected by user
+   */
+  _swapFields = function () {
+    var selected = $('#status option:selected').val();
+
+    // First reset to defaults
+    $('#option-backup, #option-contact').css('display', 'block');
+    $('#backup, #contact').removeAttr('disabled');
+
+    if (selected === 'annual leave') {
+      $('#option-contact').css('display', 'none');
+      $('#contact').attr('disabled', 'disabled');
+    }
+    else if (selected === 'working at home') {
+      $('#option-backup').css('display', 'none');
+      $('#backup').attr('disabled', 'disabled');
+    }
+  }
+
+  /**
+   * Disable 'end' field when 'indefinite' is selected
+   */
+  _toggleEndDate = function () {
+    $('#end').datepicker('setDate', null);
+    $('#end').attr('disabled', $('#indefinite').is(':checked'));
+  }
+
+
+  _initialize();
+  return _this;
+};
+
+// Instantiate
+Status();
