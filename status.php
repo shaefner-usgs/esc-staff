@@ -42,7 +42,7 @@ if (!isset($TEMPLATE)) {
 
   $TITLE = '<em>Set status for</em> ' . $Employee->fullname;
   $CSS = '/contact/staff/css/status.css';
-  $JS = '/contact/staff/js/status.js';
+  $JS = '/contact/staff/js/Status.js';
   $WIDGETS = 'jquery-ui';
   $TEMPLATE = 'sidenav';
 
