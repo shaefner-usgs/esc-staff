@@ -5,7 +5,7 @@
  *
  * @params $params {Array}
  *     key-value pairs to assign as properties to a new instance (also uses magic
- *     set method to assign properties from a db query)
+ *     set method to assign properties from a db query via PDO)
  *
  * @author Scott Haefner <shaefner@usgs.gov>
  */
@@ -269,7 +269,8 @@ class Status {
           $timespan .= '&ndash;' . date($dateFormat, $endTimestamp);
         }
 
-        // include year for past events that don't already have it (already included if date range spans mult. years)
+        // Include year for past events that don't already have it
+        //   (already included if date range spans mult. years)
         if ($currentYear !== $endYear && !$multYears) {
           $timespan .= ', ' . $endYear;
         }
