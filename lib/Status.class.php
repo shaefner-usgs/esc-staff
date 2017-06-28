@@ -27,22 +27,22 @@ class Status {
     );
   }
 
-  public function __get ($name) {
-    if (isset($this->_data[$name])) {
-      return $this->_data[$name];
+  public function __get ($key) {
+    if (isset($this->_data[$key])) {
+      return $this->_data[$key];
     }
   }
 
-  public function __set ($name, $value) {
+  public function __set ($key, $value) {
     $intVals = array(
       'id', 'recurring', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
     );
 
     // Enforce type of integer for certain props
-    if (in_array($name, $intVals)) {
+    if (in_array($key, $intVals)) {
       $value = intval($value);
     }
-    $this->_data[$name] = $value;
+    $this->_data[$key] = $value;
   }
 
   /**

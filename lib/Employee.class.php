@@ -17,12 +17,14 @@ class Employee {
     $this->_data['shortname'] = $this->_getShortName();
   }
 
-  public function __get ($name) {
-    return $this->_data[$name];
+  public function __get ($key) {
+    if (isset($this->_data[$key])) {
+      return $this->_data[$key];
+    }
   }
 
-  public function __set ($name, $value) {
-    $this->_data[$name] = $value;
+  public function __set ($key, $value) {
+    $this->_data[$key] = $value;
   }
 
   /**

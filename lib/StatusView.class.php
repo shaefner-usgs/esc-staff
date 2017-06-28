@@ -32,18 +32,18 @@ class StatusView {
   /**
    * Get html snippet for marking a checkbox as checked
    *
-   * @param $name {String}
-   *   name value of form field
+   * @param $key {String}
+   *   property name of form field
    *
    * @return $checked {String}
    */
-  private function _getCheckedSnippet ($name) {
+  private function _getCheckedSnippet ($key) {
     $checked = '';
 
     // Only need to get checked state when in edit mode
     if ($this->_view === 'edit') {
       $Status = $this->_employee->status->edit->entries[0];
-      if ($Status->$name) {
+      if ($Status->$key) {
         $checked = ' checked="checked"';
       }
     }
