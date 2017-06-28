@@ -43,7 +43,7 @@ class StatusView {
     // Only need to get checked state when in edit mode
     if ($this->_view === 'edit') {
       $Status = $this->_employee->status->edit->entries[0];
-      if ($Status->$name === '1') {
+      if ($Status->$name) {
         $checked = ' checked="checked"';
       }
     }
@@ -110,7 +110,7 @@ class StatusView {
         $day,
         ucwords($day)
       );
-      // Set hidden inputs w/ same name (values set to '0') to include unchecked boxes in $_POST 
+      // Set hidden inputs w/ same name (values set to '0') to include unchecked boxes in $_POST
       //   ('real' inputs will override since they are listed later in the markup)
       $hiddenCheckBoxes .= sprintf('<input type="hidden" name="%s" value="0" />',
         $day

@@ -18,7 +18,7 @@ class Status {
     // from database when using PDO::FETCH_CLASS to instantiate
     if (is_array($params)) {
       foreach ($params as $key => $value) {
-        $this->_data[$key] = $value;
+        $this->__set($key, $value);
       }
     }
 
@@ -34,6 +34,14 @@ class Status {
   }
 
   public function __set ($name, $value) {
+    $intVals = array(
+      'id', 'recurring', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
+    );
+
+    // Enforce type of integer for certain props
+    if (in_array($name, $intVals)) {
+      $value = intval($value);
+    }
     $this->_data[$name] = $value;
   }
 
@@ -51,7 +59,7 @@ class Status {
     );
 
     // Set begin / end dates to correct format (NULL or yyyy-mm-dd)
-    $indefinite = isset($this->_data['indefinite']) && $this->_data['indefinite'] === '1';
+    $indefinite = isset($this->_data['indefinite']) && $this->_data['indefinite'] === 1;
     if ($indefinite) {
       $this->_data['end'] = NULL;
     } else {
@@ -214,9 +222,9 @@ class Status {
     }
 
     // For recurring entries, get the list of days that apply
-    if (isset($this->_data['recurring']) && $this->_data['recurring'] === '1') {
+    if (isset($this->_data['recurring']) && $this->_data['recurring'] === 1) {
       foreach ($this->_days as $day) {
-        if ($this->_data[$day] === '1') {
+        if ($this->_data[$day]) {
           $recDays[] = ucwords($day) . 's';
         }
       }
@@ -287,7 +295,7 @@ class Status {
       $today = strtolower(date('l'));
 
       foreach ($this->_days as $day) {
-        if ($day === $today && $this->_data[$day] === '1') {
+        if ($day === $today && $this->_data[$day]) {
           $r = true;
         }
       }
