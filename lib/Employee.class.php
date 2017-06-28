@@ -95,7 +95,7 @@ class Employee {
     // Create a default Status instance
     $defaultOptions = array(
       'status' => 'in the office',
-      'timespan' => 'today',
+      'timespan' => 'Today',
       'type' => 'default'
     );
     $options = array_merge($defaultOptions, $options);
