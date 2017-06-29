@@ -35,7 +35,8 @@ class Status {
 
   public function __set ($key, $value) {
     $intVals = array(
-      'id', 'recurring', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
+      'friday', 'id', 'indefinite', 'monday', 'recurring', 'thursday',
+      'tuesday', 'wednesday' 
     );
 
     // Enforce type of integer for certain props
@@ -53,14 +54,13 @@ class Status {
    */
   private function _filterSqlData () {
     $allowedFields = array(
-      'backup', 'begin', 'changed', 'comments', 'contact', 'end', 'ip',
-      'friday', 'monday', 'recurring', 'shortname', 'status', 'thursday',
+      'backup', 'begin', 'changed', 'comments', 'contact', 'end', 'friday',
+      'ip', 'monday', 'recurring', 'shortname', 'status', 'thursday',
       'tuesday', 'wednesday'
     );
 
     // Set begin / end dates to correct format (NULL or yyyy-mm-dd)
-    $indefinite = isset($this->_data['indefinite']) && $this->_data['indefinite'] === 1;
-    if ($indefinite) {
+    if (isset($this->_data['indefinite']) && $this->_data['indefinite']) {
       $this->_data['end'] = NULL;
     } else {
       if ($this->_data['begin'] && !$this->_data['end']) {
@@ -222,7 +222,7 @@ class Status {
     }
 
     // For recurring entries, get the list of days that apply
-    if (isset($this->_data['recurring']) && $this->_data['recurring'] === 1) {
+    if (isset($this->_data['recurring']) && $this->_data['recurring']) {
       foreach ($this->_days as $day) {
         if ($this->_data[$day]) {
           $recDays[] = ucwords($day) . 's';
