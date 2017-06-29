@@ -43,6 +43,15 @@ class EmployeeView {
   }
 
   /**
+   * Get back link
+   *
+   * @return {String}
+   */
+  private function _getBackLink () {
+    return '<p>&laquo; <a href="../">Back</a></p>';
+  }
+
+  /**
    * Create HTML for employee details table
    *
    * @return $html {String}
@@ -151,6 +160,7 @@ class EmployeeView {
   public function render () {
     print $this->_getTitle();
     print $this->_getEmployeeDetails();
+    print $this->_getBackLink();
     print $this->_getStatusEntries();
     print $this->_getSetStatusLink();
   }
