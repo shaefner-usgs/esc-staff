@@ -36,7 +36,7 @@ class Status {
   public function __set ($key, $value) {
     $intVals = array(
       'friday', 'id', 'indefinite', 'monday', 'recurring', 'thursday',
-      'tuesday', 'wednesday' 
+      'tuesday', 'wednesday'
     );
 
     // Enforce type of integer for certain props
@@ -244,6 +244,7 @@ class Status {
       $currentYear = date('Y');
       $beginYear = date('Y', strtotime($begin));
       $endYear = date('Y', strtotime($end));
+
       $multYears = false;
       if ($beginYear !== $endYear) {
         $multYears = true;

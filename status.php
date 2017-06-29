@@ -26,7 +26,7 @@ if (!isset($TEMPLATE)) {
       $Status->delete($Db);
 
       // Take user back to their status page
-      header("Location: ../../");
+      header('Location: ../../');
     }
     else if ($action === 'edit') {
       $Status = new Status($_POST);
@@ -58,9 +58,9 @@ $statusEntries = array();
 
 if ($view === 'add') { // default view: show add form + list of status entries
   // Query database to get employee's status entries
-  $rsStatusEntriesPresent = $Db->selectStatusEntries($shortname);
   $rsStatusEntriesFuture = $Db->selectStatusEntries($shortname, 'future');
   $rsStatusEntriesPast = $Db->selectStatusEntries($shortname, 'past');
+  $rsStatusEntriesPresent = $Db->selectStatusEntries($shortname);
   $rsStatusEntriesRec = $Db->selectStatusEntries($shortname, 'recurring');
 
   // Create a Status instance for each entry
