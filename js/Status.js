@@ -2,6 +2,8 @@
 
 /**
  * Class: Status
+ *
+ * Validate form before submitting and tweak form display based on status entry properties
  */
 var Status = function () {
 
@@ -146,12 +148,17 @@ var Status = function () {
     $('input, select').removeClass('error');
     $('p.error').remove();
 
-    // Begin date
+    // Check if status is set
+    if (!$('#status option:selected').val()) {
+      _showError('#status', 'Select a status');
+    }
+
+    // Check if begin date is set
     if (!$('#begin').val() && !$('#recurring').is(':checked')) {
       _showError('#begin', 'Enter a beginning date');
     }
 
-    // Recurring
+    // Check if at least one day is selected under recurring
     if ($('#recurring').is(':checked')) {
       checked = false;
 
@@ -165,11 +172,6 @@ var Status = function () {
       if (!checked) {
         _showError('#option-days', 'Select at least 1 day');
       }
-    }
-
-    // Status
-    if (!$('#status option:selected').val()) {
-      _showError('#status', 'Select a status');
     }
 
     if (_errors) {
@@ -203,26 +205,31 @@ var Status = function () {
 
     if (selected === 'annual leave') {
       $('#option-contact').css('display', 'none');
-      $('#contact').attr('disabled', 'disabled');
+      $('#contact').prop('disabled', 'disabled');
     }
     else if (selected === 'working at home') {
       $('#option-backup').css('display', 'none');
-      $('#backup').attr('disabled', 'disabled');
+      $('#backup').prop('disabled', 'disabled');
     }
   }
 
   /**
-   * Disable 'end' field when 'indefinite' is selected
+   * Disable 'end' field when 'indefinite' is checked
    */
   _toggleEndDate = function () {
-    $('#end').datepicker('setDate', null);
-    $('#end').attr('disabled', $('#indefinite').is(':checked'));
+    var checked = $('#indefinite').is(':checked');
+
+    $('#end').prop('disabled', checked);
+    if (checked) {
+      $('#end').datepicker('setDate', null);
+    }
   }
 
 
   _initialize();
   return _this;
 };
+
 
 // Instantiate
 Status();
