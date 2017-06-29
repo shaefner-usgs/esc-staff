@@ -51,7 +51,18 @@ h1 em {
 .fieldtitle {
   color: #4d4d4d;
   font-weight: 500;
+  line-height: 1;
   margin: 1.25em 0 3px;
+}
+#option-days .fieldtitle {
+  margin-bottom: 8px;
+}
+
+.note {
+  color: #999;
+  font-size: .9em;
+  font-weight: 500;
+  margin-top: .5em;
 }
 
 .ui-datepicker-calendar td {

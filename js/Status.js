@@ -108,14 +108,14 @@ var Status = function () {
     _errors = true;
 
     if (el === '#begin') {
-      selector = '#forever';
+      selector = $('#forever');
     } else if (el === '#option-days') {
-      selector = '#option-days label:last-child';
+      selector = $('#option-days label').filter(':last');
     } else {
-      selector = el;
+      selector = $(el);
     }
 
-    $(selector).after('<p class="error">' + msg + '</p>');
+    selector.after('<p class="error">' + msg + '</p>');
     $(el).addClass('error');
   }
 

@@ -157,9 +157,14 @@ class StatusView {
         <div id="option-days" class="checkbox">
           <p class="fieldtitle">Repeat every:</p>
           %s
+          <p class="note">Note: Recurring entries have lower priority. So, for
+            example, if you work at home every Tuesday, and you go on A/L for a
+            week, the A/L entry will take precedence over the recurring entry.
+            You don&rsquo;t need to delete the recurring entry during the week
+            you&rsquo;re on A/L.</p>
         </div>
         <div id="option-contact">
-          <label for="contact" class="fieldtitle">Location & contact info <em>Include city, hotel, etc.</em></label>
+          <label for="contact" class="fieldtitle">Location &amp; contact info <em>Include city, hotel, etc.</em></label>
           <textarea name="contact" id="contact" rows="2" cols="40">%s</textarea>
         </div>
         <div id="option-backup" class="fieldtitle">
